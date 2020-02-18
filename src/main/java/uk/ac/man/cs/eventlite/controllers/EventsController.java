@@ -17,14 +17,14 @@ public class EventsController {
 	@Autowired
 	private EventService eventService;
 
-	@Autowired
-	private VenueService venueService;
+	// @Autowired
+	// private VenueService venueService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAllEvents(Model model) {
 
 		model.addAttribute("events", eventService.findAll());
-		model.addAttribute("venues", venueService.findAll());
+		// model.addAttribute("venues", venueService.findAll());
 
 		return "events/index";
 	}

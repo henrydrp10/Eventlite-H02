@@ -36,7 +36,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import uk.ac.man.cs.eventlite.EventLite;
 import uk.ac.man.cs.eventlite.dao.EventService;
+import uk.ac.man.cs.eventlite.dao.VenueService;
 import uk.ac.man.cs.eventlite.entities.Event;
+import uk.ac.man.cs.eventlite.entities.Venue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = EventLite.class)
@@ -50,6 +52,9 @@ public class EventsControllerApiTest {
 	@Autowired
 	private Filter springSecurityFilterChain;
 
+	@Mock
+	private VenueService venueService;
+	
 	@Mock
 	private EventService eventService;
 
@@ -76,12 +81,19 @@ public class EventsControllerApiTest {
 
 	@Test
 	public void getIndexWithEvents() throws Exception {
+		
+		Venue v = new Venue();
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		
 		Event e = new Event();
 		e.setId(0);
 		e.setName("Event");
 		e.setDate(LocalDate.now());
 		e.setTime(LocalTime.now());
-		e.setVenue(0);
+		e.setVenue(v);
+		
 		when(eventService.findAll()).thenReturn(Collections.<Event>singletonList(e));
 
 		mvc.perform(get("/api/events").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
