@@ -33,7 +33,8 @@ public class Event {
 	
 	private String description;
 	
-
+	private String summary;
+	
 	@ManyToOne
 	private Venue venue;
 
@@ -87,5 +88,13 @@ public class Event {
 	
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public String getSummary() {
+		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
 	}
 }
