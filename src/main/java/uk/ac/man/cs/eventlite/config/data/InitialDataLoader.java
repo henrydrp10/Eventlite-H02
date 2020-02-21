@@ -12,7 +12,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import uk.ac.man.cs.eventlite.dao.EventService;
-import uk.ac.man.cs.eventlite.dao.VenueRepository;
+//import uk.ac.man.cs.eventlite.dao.VenueRepository;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
@@ -58,7 +58,7 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 
 		event1.setDescription("A joana e linda");
 		event1.setVenue(venue1);
-		event1.setSummary("a nice description for test event 1");
+		event1.setSummary("a nice summary for test event 1");
 		eventService.save(event1);
 		
 		Event event2 = new Event();
@@ -68,7 +68,7 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 	
 		event2.setDescription("A joana e linda");
 		event2.setVenue(venue2);
-		event2.setSummary("a nice description for test event 2");
+		event2.setSummary("a nice summary for test event 2");
 		eventService.save(event2);
 		
 		Event event3 = new Event();
@@ -78,7 +78,7 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 
 		event3.setDescription("A joana e linda");
 		event3.setVenue(venue1);
-		event3.setSummary("a nice description for test event 3");
+		event3.setSummary("a nice summary for test event 3");
 		eventService.save(event3);
 		
 		Event event4 = new Event();
@@ -88,7 +88,7 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 
 		event4.setDescription("A joana e linda");
 		event4.setVenue(venue2);
-		event4.setSummary("a nice description for test event 4");
+		event4.setSummary("a nice summary for test event 4");
 		eventService.save(event4);
 	}
 }
