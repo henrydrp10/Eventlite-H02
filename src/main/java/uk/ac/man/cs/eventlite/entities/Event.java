@@ -30,6 +30,9 @@ public class Event {
 	private LocalTime time;
 
 	private String name;
+	
+	private String description;
+	
 
 	@ManyToOne
 	private Venue venue;
@@ -56,7 +59,11 @@ public class Event {
 	public LocalTime getTime() {
 		return time;
 	}
-
+	
+	public String getDescription() {
+		return description;
+	}
+	
 	public void setTime(LocalTime time) {
 		this.time = time;
 	}
@@ -75,5 +82,10 @@ public class Event {
 
 	public void setVenue(Venue venue) {
 		this.venue = venue;
+	}
+	
+	
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

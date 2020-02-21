@@ -55,6 +55,8 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 		event1.setName("Test Event 1");
 		event1.setDate(LocalDate.parse("2020-02-13"));
 		event1.setTime(LocalTime.parse("12:00"));
+
+		event1.setDescription("A joana e linda");
 		event1.setVenue(venue1);
 		eventService.save(event1);
 		
@@ -62,6 +64,8 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 		event2.setName("Test Event 2");
 		event2.setDate(LocalDate.parse("2020-02-14"));
 		event2.setTime(LocalTime.parse("08:00"));
+	
+		event2.setDescription("A joana e linda");
 		event2.setVenue(venue2);
 		eventService.save(event2);
 		
@@ -69,6 +73,8 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 		event3.setName("Test Event 3");
 		event3.setDate(LocalDate.parse("2020-02-13"));
 		event3.setTime(LocalTime.parse("08:00"));
+
+		event3.setDescription("A joana e linda");
 		event3.setVenue(venue1);
 		eventService.save(event3);
 		
@@ -76,6 +82,8 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 		event4.setName("Test Event 4");
 		event4.setDate(LocalDate.parse("2020-02-14"));
 		event4.setTime(LocalTime.parse("09:00"));
+
+		event4.setDescription("A joana e linda");
 		event4.setVenue(venue2);
 		eventService.save(event4);
 	}
