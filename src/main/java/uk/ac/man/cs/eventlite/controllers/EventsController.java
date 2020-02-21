@@ -32,6 +32,8 @@ public class EventsController {
 		return "events/index";
 	}
 	
+
+	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public String showEventDetails(@PathVariable("id") long id, Model model) {
 
@@ -40,5 +42,7 @@ public class EventsController {
 
 		return "events/event_details";
 	}
+	
+	
 
 }
