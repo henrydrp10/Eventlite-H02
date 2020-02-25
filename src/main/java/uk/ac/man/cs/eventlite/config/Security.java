@@ -24,7 +24,9 @@ public class Security extends WebSecurityConfigurerAdapter {
 	// List the mappings/methods for which no authorisation is required.
 	// By default we allow all GETs and full access to the H2 console.
 	private static final RequestMatcher[] NO_AUTH = { new AntPathRequestMatcher("/webjars/**", "GET"),
-			 new AntPathRequestMatcher("/h2-console/**") };
+			 new AntPathRequestMatcher("/h2-console/**"),new AntPathRequestMatcher("/**", "GET")};
+	// comment new AntPathRequestMatcher("/**", "GET") for ole base to work
+	// for now not applied since tests would need changing
 	
 	private static final RequestMatcher[] A = { new AntPathRequestMatcher("/events/**", "GET") };
 	//new AntPathRequestMatcher("/**", "GET")
