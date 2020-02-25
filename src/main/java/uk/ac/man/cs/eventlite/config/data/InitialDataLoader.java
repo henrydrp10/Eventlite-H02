@@ -50,6 +50,11 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 		venue2.setCapacity(2000);
 		venueService.save(venue2);
 		
+		Venue venue3 = new Venue();
+		venue3.setName("Test Venue 3");
+		venue3.setCapacity(3000);
+		venueService.save(venue3);
+		
 		// Create test events
 		Event event1 = new Event();
 		event1.setName("Test Event 1");
