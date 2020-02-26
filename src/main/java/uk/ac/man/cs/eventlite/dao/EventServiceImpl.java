@@ -24,6 +24,18 @@ public class EventServiceImpl implements EventService {
 	}
 	
 	@Override
+	public Iterable<Event> findPast() {
+		Sort sortRule = Sort.by(Sort.Direction.ASC, "date");
+		return eventRepository.findAll(sortRule.and(Sort.by(Sort.Direction.ASC, "time")));
+	}
+	
+	@Override
+	public Iterable<Event> findPresent() {
+		Sort sortRule = Sort.by(Sort.Direction.ASC, "date");
+		return eventRepository.findAll(sortRule.and(Sort.by(Sort.Direction.ASC, "time")));
+	}
+	
+	@Override
 	public Event save(Event e) {		
 		return eventRepository.save(e);
 	}
