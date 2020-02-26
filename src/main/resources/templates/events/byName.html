@@ -3,17 +3,12 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default}">
 <head>
-  <title>All events</title>
+  <title>Events that match your search</title>
 </head>
 <body>
   <div layout:fragment="content">
-    <h1>All events</h1>
+    <h1>Events that match your search</h1>
 
-	<form class="form-group" action="/events/byName">
-  		<input type="text" placeholder="Search..." name="search">
-  		<button type="submit"><i class="fa fa-search"></i></button>
-	</form>
-	
     <table class="table table-striped table-hover">
       <thead>
         <tr>
@@ -21,18 +16,14 @@
           <th><i class="fas fa-map-marker-alt"></i> Venue</th>
           <th><i class="fas fa-calendar"></i> Date</th>
           <th><i class="fas fa-clock"></i> Time</th>
-          <th>Summary</th>
         </tr>
       </thead>
       <tbody>
         <tr th:each="e : ${events}">
-          <td >
-                 <a th:href="@{/events/{num}(num=${e.id})}" th:text="${e.name}">My Event</a>
-          </td>
+          <td th:text="${e.name}">My Event</td>
           <td th:text="${e.venue.name}">Event venue</td>
           <td th:text="${{e.date}}">Event date</td>
           <td th:text="${{e.time}}">Event time</td>
-          <td th:text="${{e.summary}}">Event Summary</td>
         </tr>
       </tbody>
     </table>
