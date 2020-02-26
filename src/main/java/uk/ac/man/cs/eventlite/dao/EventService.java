@@ -11,4 +11,8 @@ public interface EventService {
 	public Event save(Event e);
 	
 	public Event findOne(long id);
+	
+	public Iterable<Event> findPast();
+	
+	public Iterable<Event> findFuture();
 }

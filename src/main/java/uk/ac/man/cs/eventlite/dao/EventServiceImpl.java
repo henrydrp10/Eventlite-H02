@@ -30,7 +30,7 @@ public class EventServiceImpl implements EventService {
 	}
 	
 	@Override
-	public Iterable<Event> findPresent() {
+	public Iterable<Event> findFuture() {
 		Sort sortRule = Sort.by(Sort.Direction.ASC, "date");
 		return eventRepository.findAll(sortRule.and(Sort.by(Sort.Direction.ASC, "time")));
 	}
@@ -44,4 +44,5 @@ public class EventServiceImpl implements EventService {
 	public Event findOne(long id) {		
 		return eventRepository.findById(id).orElse(null);
 	}
+
 }

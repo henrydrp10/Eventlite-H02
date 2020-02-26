@@ -27,12 +27,12 @@ public class EventsController {
 	public String getAllEvents(Model model) {
 
 		model.addAttribute("events", eventService.findAll());
+		model.addAttribute("eventsp", eventService.findAll());
+		model.addAttribute("eventsf", eventService.findAll());
 		// model.addAttribute("venues", venueService.findAll());
 
 		return "events/index";
 	}
-	
-
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public String showEventDetails(@PathVariable("id") long id, Model model) {
