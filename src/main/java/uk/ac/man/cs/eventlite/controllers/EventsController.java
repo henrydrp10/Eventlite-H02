@@ -1,6 +1,8 @@
 package uk.ac.man.cs.eventlite.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 //import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import uk.ac.man.cs.eventlite.dao.EventService;
 //import uk.ac.man.cs.eventlite.dao.VenueService;
@@ -43,6 +46,16 @@ public class EventsController {
 		return "events/event_details";
 	}
 	
-	
-
+	@RequestMapping(value = "/byName", method = RequestMethod.GET)
+	public String getEventsByName(Model model, @RequestParam String search) {
+		
+		Event query = new Event();
+		query.setName(search);
+		ExampleMatcher matcher = ExampleMatcher.matchingAny()
+							.withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+		Example<Event> eventExample = Example.of(query, matcher);
+		
+		model.addAttribute("events", eventService.findAll(eventExample));
+		return "events/byName";
+	}
 }

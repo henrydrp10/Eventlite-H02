@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
@@ -14,6 +16,7 @@ import org.springframework.hateoas.Resources;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import uk.ac.man.cs.eventlite.dao.EventService;
@@ -30,6 +33,18 @@ public class EventsControllerApi {
 	public Resources<Resource<Event>> getAllEvents() {
 
 		return eventToResource(eventService.findAll());
+	}
+	
+	@RequestMapping(value = "/byName", method = RequestMethod.GET)
+	public Resources<Resource<Event>> getEventsByName(@RequestParam String search) {
+
+		Event query = new Event();
+		query.setName(search);
+		ExampleMatcher matcher = ExampleMatcher.matchingAll()
+							.withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+		Example<Event> eventExample = Example.of(query, matcher);
+		
+		return eventToResource(eventService.findAll(eventExample));
 	}
 
 	private Resource<Event> eventToResource(Event event) {
