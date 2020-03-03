@@ -39,4 +39,9 @@ public class EventServiceImpl implements EventService {
 		Sort sortRule = Sort.by(Sort.Direction.ASC, "date");
 		return eventRepository.findAll(example, sortRule.and(Sort.by(Sort.Direction.ASC, "name")));
 	}
+	
+	@Override
+	public void deleteById(long id) {
+		eventRepository.deleteById(id);
+	}
 }

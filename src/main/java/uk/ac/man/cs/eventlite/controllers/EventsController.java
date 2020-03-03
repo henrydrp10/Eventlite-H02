@@ -23,6 +23,7 @@ import uk.ac.man.cs.eventlite.entities.Event;
 
 @Controller
 @RequestMapping(value = "/events", produces = { MediaType.TEXT_HTML_VALUE })
+
 public class EventsController {
 
 	@Autowired
@@ -47,6 +48,14 @@ public class EventsController {
 		return "events/event_details";
 	}
 	
+	
+	@RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+	public String deleteById(@PathVariable("id") long id) {
+        
+		eventService.deleteById(id);
+		
+		return "redirect:/events";
+	}
 
 	@RequestMapping(value = "/byName", method = RequestMethod.GET)
 	public String getEventsByName(Model model, @RequestParam String search) {

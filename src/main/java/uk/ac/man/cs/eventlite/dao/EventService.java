@@ -15,4 +15,7 @@ public interface EventService {
 	public Event findOne(long id);
 	
 	public Iterable<Event> findAll(Example<Event> example);
+
+	public void deleteById(long id);
+
 }
