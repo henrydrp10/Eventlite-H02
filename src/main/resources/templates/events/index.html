@@ -22,20 +22,28 @@
           <th><i class="fas fa-calendar"></i> Date</th>
           <th><i class="fas fa-clock"></i> Time</th>
           <th>Summary</th>
+          <th><i class="fas fa-edit"></i> Update</th>
         </tr>
       </thead>
       <tbody>
         <tr th:each="e : ${events}">
-          <td >
-                 <a th:href="@{/events/{num}(num=${e.id})}" th:text="${e.name}">My Event</a>
-          </td>
+          <td ><a th:href="@{/events/{num}(num=${e.id})}" th:text="${e.name}">My Event</a></td>
           <td th:text="${e.venue.name}">Event venue</td>
           <td th:text="${{e.date}}">Event date</td>
           <td th:text="${{e.time}}">Event time</td>
           <td th:text="${{e.summary}}">Event Summary</td>
+          <td><a th:href="@{/events/updateEvent/{id}(id=${e.id})}"><i class="fas fa-pencil-alt"></i></a></td>
         </tr>
       </tbody>
     </table>
+    
+    <p>
+      
+      
+      <button type="submit" class="btn btn-primary"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>
+      
+    </p>
+    
 
   </div>
 
