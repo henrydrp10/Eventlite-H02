@@ -27,8 +27,8 @@ public class EventsController {
 	public String getAllEvents(Model model) {
 
 		model.addAttribute("events", eventService.findAll());
-		model.addAttribute("eventsp", eventService.findAll());
-		model.addAttribute("eventsf", eventService.findAll());
+		model.addAttribute("eventsp", eventService.findPast());
+		model.addAttribute("eventsf", eventService.findFuture());
 		// model.addAttribute("venues", venueService.findAll());
 
 		return "events/index";
