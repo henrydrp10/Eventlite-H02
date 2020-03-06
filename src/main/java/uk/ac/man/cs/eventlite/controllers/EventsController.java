@@ -69,7 +69,7 @@ public class EventsController {
 		Event query = new Event();
 		query.setName(search);
 		ExampleMatcher matcher = ExampleMatcher.matchingAny()
-							.withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+							.withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING).withIgnoreCase();
 		Example<Event> eventExample = Example.of(query, matcher);
 		
 		model.addAttribute("events", eventService.findAll(eventExample));
