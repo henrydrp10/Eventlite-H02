@@ -28,6 +28,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import uk.ac.man.cs.eventlite.EventLite;
@@ -96,5 +97,14 @@ public class EventsControllerTest {
 		// verify(venueService).findAll();
 		verifyZeroInteractions(event);
 		verifyZeroInteractions(venue);
+	}
+	
+	@Test
+	public void getEvent() throws Exception {
+		when(eventService.findOne(1)).thenReturn(event);
+
+		mvc.perform(MockMvcRequestBuilders.get("/events/1").accept(MediaType.TEXT_HTML)).andExpect(status().isOk())
+		.andExpect(view().name("events/event_details")).andExpect(handler().methodName("showEventDetails"));
+	//	verify(event).getEvent();
 	}
 }

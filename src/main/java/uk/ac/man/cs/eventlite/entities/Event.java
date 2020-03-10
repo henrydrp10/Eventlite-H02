@@ -107,4 +107,13 @@ public class Event {
 	public void setSummary(String summary) {
 		this.summary = summary;
 	}
+	
+	public String getEvent() {
+		return String.format(this.name);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("Event [id = %d, venue = %s, time = %s, ]", this.id, this.venue.getName(), this.date.toString());
+	}
 }
