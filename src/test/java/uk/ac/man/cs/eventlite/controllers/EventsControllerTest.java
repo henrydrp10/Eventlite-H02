@@ -105,6 +105,6 @@ public class EventsControllerTest {
 
 		mvc.perform(MockMvcRequestBuilders.get("/events/1").accept(MediaType.TEXT_HTML)).andExpect(status().isOk())
 		.andExpect(view().name("events/event_details")).andExpect(handler().methodName("showEventDetails"));
-	//	verify(event).getEvent();
+		verify(eventService).findOne(1);
 	}
 }
