@@ -1,7 +1,6 @@
 package uk.ac.man.cs.eventlite.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +32,10 @@ public class EventServiceImpl implements EventService {
 	public Event findOne(long id) {		
 		return eventRepository.findById(id).orElse(null);
 	}
-	
+
 	@Override
-	public Iterable<Event> findAll(Example<Event> example) {
-		Sort sortRule = Sort.by(Sort.Direction.ASC, "date");
-		return eventRepository.findAll(example, sortRule.and(Sort.by(Sort.Direction.ASC, "name")));
+	public Iterable<Event> findAllByName (String search) {
+		String regex = "\\b" + search.toUpperCase() + "\\b";
+		return eventRepository.findAllByName(regex);
 	}
 }

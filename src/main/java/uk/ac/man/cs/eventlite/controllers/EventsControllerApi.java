@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
@@ -38,13 +36,7 @@ public class EventsControllerApi {
 	@RequestMapping(value = "/byName", method = RequestMethod.GET)
 	public Resources<Resource<Event>> getEventsByName(@RequestParam String search) {
 
-		Event query = new Event();
-		query.setName(search);
-		ExampleMatcher matcher = ExampleMatcher.matchingAll()
-							.withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-		Example<Event> eventExample = Example.of(query, matcher);
-		
-		return eventToResource(eventService.findAll(eventExample));
+		return eventToResource(eventService.findAllByName(search));
 	}
 
 	private Resource<Event> eventToResource(Event event) {

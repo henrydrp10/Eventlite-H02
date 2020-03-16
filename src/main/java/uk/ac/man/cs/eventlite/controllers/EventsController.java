@@ -1,8 +1,6 @@
 package uk.ac.man.cs.eventlite.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,13 +47,7 @@ public class EventsController {
 	@RequestMapping(value = "/byName", method = RequestMethod.GET)
 	public String getEventsByName(Model model, @RequestParam String search) {
 		
-		Event query = new Event();
-		query.setName(search);
-		ExampleMatcher matcher = ExampleMatcher.matchingAny()
-							.withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING).withIgnoreCase();
-		Example<Event> eventExample = Example.of(query, matcher);
-		
-		model.addAttribute("events", eventService.findAll(eventExample));
+		model.addAttribute("events", eventService.findAllByName(search));
 		return "events/byName";
 	}
 }
