@@ -148,7 +148,8 @@ public class EventsControllerTest {
 
 	verify(eventService).deleteById(1);
 	}
-
+ 
+	
 	@Test
 	@WithMockUser(username = "Mustafa", password = "Mustafa", roles= {"USER"})
 	public void deleteEventByNameUnauthorisedUser() throws Exception
