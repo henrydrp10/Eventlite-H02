@@ -1,8 +1,11 @@
 package uk.ac.man.cs.eventlite.controllers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Collection;
 import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +27,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
 import uk.ac.man.cs.eventlite.EventLite;
+import uk.ac.man.cs.eventlite.dao.EventService;
+import uk.ac.man.cs.eventlite.entities.Event;
+import uk.ac.man.cs.eventlite.entities.Venue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = EventLite.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -35,6 +41,9 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 
 	@Autowired
 	private TestRestTemplate template;
+	
+	@Autowired
+	private EventService eventService;
 
 	@BeforeEach
 	public void setup() {
@@ -50,4 +59,30 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 	}
+	
+	@Test
+	public void testGetEventsByName() {
+		Iterable<Event> allEvents = eventService.findAll();
+		assertThat(((Collection<Event>) allEvents).size(), is(4));
+		
+		// Case where the term is not complete (whole term match implementation)
+		Iterable<Event> eventList = eventService.findAllByName("Even");
+		assertThat(((Collection<Event>) eventList).size(), is(0));
+		
+		// Case where the term is complete, ignoring case (should return all)
+		eventList = eventService.findAllByName("EVENT");
+		assertThat(((Collection<Event>) eventList).size(), 
+		   equalTo(((Collection<Event>) allEvents).size()));
+		for(Event event : eventList) {
+			assertThat(allEvents, hasItem(event));
+		}
+		
+		// Case where looking for a specific event (should return 1).
+		eventList = eventService.findAllByName("Test Event 3");
+		assertThat(((Collection<Event>) eventList).size(), is(1));
+		for(Event event : eventList) {
+			assertThat(event.getName(), equalTo("Test Event 3"));
+		}
+	}
+
 }
