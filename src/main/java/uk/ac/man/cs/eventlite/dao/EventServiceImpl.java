@@ -1,5 +1,6 @@
 package uk.ac.man.cs.eventlite.dao;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +8,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,14 @@ import uk.ac.man.cs.eventlite.entities.Event;
 
 @Service
 public class EventServiceImpl implements EventService {
+	
+	@Bean
+	public Clock clock() {
+	    return Clock.systemDefaultZone();
+	}
+	
+	@Autowired
+    public Clock clock;
 	
 	@Autowired
 	private EventRepository eventRepository;
@@ -34,7 +44,7 @@ public class EventServiceImpl implements EventService {
 		Sort sortRule = Sort.by(Sort.Direction.ASC, "date");
 		Iterable<Event> events = eventRepository.findAll(sortRule.and(Sort.by(Sort.Direction.DESC, "name")));
 		List<Event> pastEvents = new ArrayList<Event>();
-		LocalDate currentTimeStamp = LocalDate.now();
+		LocalDate currentTimeStamp = LocalDate.now(clock);
 		
 		for(Event event : events)
 		{
@@ -58,7 +68,7 @@ public class EventServiceImpl implements EventService {
 		Sort sortRule = Sort.by(Sort.Direction.DESC, "date");
 		Iterable<Event> events = eventRepository.findAll(sortRule.and(Sort.by(Sort.Direction.DESC, "name")));
 		List<Event> futureEvents = new ArrayList<Event>();
-		LocalDate currentTimeStamp = LocalDate.now();
+		LocalDate currentTimeStamp = LocalDate.now(clock);
 		
 		for(Event event : events)
 		{
