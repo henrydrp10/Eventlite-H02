@@ -1,7 +1,5 @@
 package uk.ac.man.cs.eventlite.dao;
 
-import org.springframework.data.domain.Example;
-
 import uk.ac.man.cs.eventlite.entities.Event;
 
 public interface EventService {
@@ -13,12 +11,12 @@ public interface EventService {
 	public Event save(Event e);
 	
 	public Event findOne(long id);
-	
-	public Iterable<Event> findAll(Example<Event> example);
 
 	public void deleteById(long id);
 
 	public Iterable<Event> findPast();
 	
 	public Iterable<Event> findFuture();
+
+	public Iterable<Event> findAllByName(String regex);
 }

@@ -6,13 +6,14 @@
   <title>All events</title>
 </head>
 <body>
-
+	
+  <div layout:fragment="content">
+  
 	<form class="form-group" action="/events/byName">
 		<input type="text" placeholder="Search..." name="search">
 		<button type="submit"><i class="fa fa-search"></i></button>
 	</form>
 	
-  <div layout:fragment="content">
     <h1>Upcoming Events</h1>
     <table class="table table-striped table-hover">
       <thead>
