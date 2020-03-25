@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <title>Event</title>
+</head>
+<body>
+  <div layout:fragment="content">
+    <h1 th:text="${event.name}"> Text</h1>
+     <blockquote>
+      <h2>Where?</h2>
+      <p th:text="${event.venue.name}"></p>
+    </blockquote>
+    <blockquote>
+    <h2>When?</h2>
+      <p th:text="${event.date}"></p>
+      <p></p>
+      <p th:text="${event.time}"></p>
+    </blockquote>
+    <h2>What?</h2>
+      <p > <b>Summary: </b></p>
+      <p th:text="${event.summary}"></p>
+      <p></p>
+      <p > <b> Description: </b></p>
+      <p th:text="${event.description}"></p>
+    </blockquote>
+    
+    <a class="btn btn-primary" role="button" th:href="@{/events}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
+    
+    <br><br>
+    <div class="form-group">
+      <form th:action="@{/events/delete/{num}(num=${id})}" th:method="delete">
+      <button type="submit" class="btn btn-primary"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>
+      </form>
+    </div>
+    
+  </div>
+
+</body>
+</html>

@@ -1,6 +1,13 @@
 package uk.ac.man.cs.eventlite.dao;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +15,14 @@ import uk.ac.man.cs.eventlite.entities.Event;
 
 @Service
 public class EventServiceImpl implements EventService {
+	
+	@Bean
+	public Clock clock() {
+	    return Clock.systemDefaultZone();
+	}
+	
+	@Autowired
+    public Clock clock;
 	
 	@Autowired
 	private EventRepository eventRepository;
@@ -20,11 +35,75 @@ public class EventServiceImpl implements EventService {
 	@Override
 	public Iterable<Event> findAll() {
 		Sort sortRule = Sort.by(Sort.Direction.ASC, "date");
-		return eventRepository.findAll(sortRule.and(Sort.by(Sort.Direction.ASC, "time")));
+		return eventRepository.findAll(sortRule.and(Sort.by(Sort.Direction.ASC, "name")));
+	}
+	
+	@Override
+	public Iterable<Event> findPast() {
+		Sort sortRule = Sort.by(Sort.Direction.ASC, "date");
+		Iterable<Event> events = eventRepository.findAll(sortRule.and(Sort.by(Sort.Direction.DESC, "name")));
+		List<Event> pastEvents = new ArrayList<Event>();
+		LocalDate currentTimeStamp = LocalDate.now(clock);
+		
+		for(Event event : events)
+		{
+			LocalDate eventDate = event.getDate();
+			if(currentTimeStamp.isAfter(eventDate))
+			{
+				pastEvents.add(event);
+			}
+			else if(currentTimeStamp.getDayOfYear() != eventDate.getDayOfYear() 
+					|| currentTimeStamp.getYear() != eventDate.getYear())
+				break;
+		}	
+		
+		Collections.reverse(pastEvents);
+		
+		return pastEvents;
+	}
+	
+	@Override
+	public Iterable<Event> findFuture() {
+		Sort sortRule = Sort.by(Sort.Direction.DESC, "date");
+		Iterable<Event> events = eventRepository.findAll(sortRule.and(Sort.by(Sort.Direction.DESC, "name")));
+		List<Event> futureEvents = new ArrayList<Event>();
+		LocalDate currentTimeStamp = LocalDate.now(clock);
+		
+		for(Event event : events)
+		{
+			LocalDate eventDate = event.getDate();
+			if(!currentTimeStamp.isAfter(eventDate))
+			{
+				futureEvents.add(event);
+			}
+			else if(currentTimeStamp.getDayOfYear() != eventDate.getDayOfYear() 
+					|| currentTimeStamp.getYear() != eventDate.getYear())
+				break;	
+		}	
+		
+		Collections.reverse(futureEvents);
+		
+		return futureEvents;
 	}
 	
 	@Override
 	public Event save(Event e) {		
 		return eventRepository.save(e);
+	}
+	
+	@Override
+	public Event findOne(long id) {		
+		return eventRepository.findById(id).orElse(null);
+	}
+
+	@Override
+	public Iterable<Event> findAllByName (String search) {
+		String regex = "\\b" + search.toUpperCase() + "\\b";
+		return eventRepository.findAllByName(regex);
+	}
+	
+	@Override
+	public void deleteById(long id) {
+		eventRepository.deleteById(id);
 	}
 }
