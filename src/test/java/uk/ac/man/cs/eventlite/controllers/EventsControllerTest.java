@@ -3,6 +3,7 @@ package uk.ac.man.cs.eventlite.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
+
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -25,7 +26,6 @@ import javax.servlet.Filter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -41,12 +42,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import uk.ac.man.cs.eventlite.config.Security;
 import uk.ac.man.cs.eventlite.EventLite;
 import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
+
+import org.mockito.ArgumentCaptor;
+import uk.ac.man.cs.eventlite.config.Security;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = EventLite.class)
@@ -217,5 +220,39 @@ public class EventsControllerTest {
 		.andExpect(handler().methodName("createEvent")).andExpect(flash().attributeCount(0));
 
 		verify(eventService, never()).save(event);
+	}
+	
+	@WithMockUser(username = "Mustafa", password = "Mustafa", roles= {"ADMINISTRATOR"})
+	public void deleteEventByName() throws Exception {
+		when(eventService.findOne(1)).thenReturn(event);
+	
+		mvc.perform(MockMvcRequestBuilders.delete("/events/delete/1").accept(MediaType.TEXT_HTML).with(csrf()))
+		.andExpect(status().isFound())
+		.andExpect(view().name("redirect:/events"))
+		.andExpect(handler().methodName("deleteById"));
+	
+		verify(eventService).deleteById(1);
+	}
+ 
+	@Test
+	@WithMockUser(username = "Mustafa", password = "Mustafa", roles= {"USER"})
+	public void deleteEventByNameUnauthorisedUser() throws Exception {
+		when(eventService.findOne(1)).thenReturn(event);
+	
+		mvc.perform(MockMvcRequestBuilders.delete("/events/delete/1").accept(MediaType.TEXT_HTML).with(csrf()))
+		.andExpect(status().isForbidden());
+	
+		verify(eventService, never()).deleteById(1);
+	}
+	
+	@Test
+	@WithMockUser(username = "Mustafa", password = "Mustafa", roles= {"ADMINISTRATOR"})
+	public void deleteEventByNameNoCsrf() throws Exception {
+		when(eventService.findOne(1)).thenReturn(event);
+	
+		mvc.perform(MockMvcRequestBuilders.delete("/events/delete/1").accept(MediaType.TEXT_HTML))
+		.andExpect(status().isForbidden());
+	
+		verify(eventService, never()).deleteById(1);
 	}
 }
