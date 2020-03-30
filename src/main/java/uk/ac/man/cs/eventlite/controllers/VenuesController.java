@@ -8,13 +8,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import uk.ac.man.cs.eventlite.dao.VenueService;
-
+import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
 
 @Controller
@@ -56,6 +57,15 @@ public class VenuesController {
 		redirectAttrs.addFlashAttribute("ok_message", "New venue added.");	
 		
 		return "redirect:/events";
+	}
+	
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public String showVenueDetails(@PathVariable("id") long id, Model model) {
+
+		Venue venue = venueService.findOne(id);
+		model.addAttribute("venue", venue);
+
+		return "venues/venue_details";
 	}
 	
 }
