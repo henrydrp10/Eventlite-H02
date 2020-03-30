@@ -1,8 +1,13 @@
 package uk.ac.man.cs.eventlite.controllers;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
@@ -25,6 +31,8 @@ public class VenuesController {
 
 	@Autowired
 	private VenueService venueService;
+	@Autowired
+	private EventService eventService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAllVenues(Model model) {
@@ -63,7 +71,20 @@ public class VenuesController {
 	public String showVenueDetails(@PathVariable("id") long id, Model model) {
 
 		Venue venue = venueService.findOne(id);
+		List<Event> upcomingEventsInThisVenue = new ArrayList<Event>();
+		Iterable<Event> events = eventService.findFuture();
+		for(Event event : events)
+		{
+			if( event.getVenue() == venue)
+			{
+				upcomingEventsInThisVenue.add(event);
+			}
+			
+		}	
 		model.addAttribute("venue", venue);
+		model.addAttribute("eventsf", upcomingEventsInThisVenue);
+		
+		
 
 		return "venues/venue_details";
 	}

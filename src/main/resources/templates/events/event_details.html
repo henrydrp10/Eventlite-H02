@@ -9,16 +9,17 @@
   <div layout:fragment="content">
     <h1 th:text="${event.name}"> Text</h1>
      <blockquote>
-      <h2>Where?</h2>
-      <p th:text="${event.venue.name}"></p>
-    </blockquote>
-    <blockquote>
-    <h2>When?</h2>
+      <p > <b>Venue: </b></p>
+          <p>
+            <a th:href="@{/venues/{num}(num=${event.venue.id})}" th:text="${event.venue.name}">My Event</a>
+          </p>
+
+       <p > <b>Date: </b></p>
       <p th:text="${event.date}"></p>
       <p></p>
+      <p > <b>Time: </b></p>
       <p th:text="${event.time}"></p>
-    </blockquote>
-    <h2>What?</h2>
+
       <p > <b>Summary: </b></p>
       <p th:text="${event.summary}"></p>
       <p></p>
