@@ -17,6 +17,8 @@ public interface EventService {
 	public Iterable<Event> findPast();
 	
 	public Iterable<Event> findFuture();
+	
+	public Iterable<Event> threeUpcomingEvents();
 
 	public Iterable<Event> findAllByName(String regex);
 }

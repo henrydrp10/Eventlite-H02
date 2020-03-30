@@ -3,6 +3,7 @@ package uk.ac.man.cs.eventlite.dao;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -83,6 +84,16 @@ public class EventServiceImpl implements EventService {
 		
 		Collections.reverse(futureEvents);
 		
+		return futureEvents;
+	}
+	
+	@Override
+	public Iterable<Event> threeUpcomingEvents() {
+		Iterable<Event> futureEvents = findFuture();
+		while (((List<Event>) futureEvents).size() > 3) {
+			int lastIndex = ((List<Event>) futureEvents).size() - 1;
+			((List<Event>) futureEvents).remove(lastIndex);
+		}
 		return futureEvents;
 	}
 	
