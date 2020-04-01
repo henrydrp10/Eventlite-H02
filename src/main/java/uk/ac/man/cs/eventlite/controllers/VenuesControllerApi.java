@@ -14,6 +14,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -36,6 +37,11 @@ public class VenuesControllerApi {
 	public Resources<Resource<Venue>> getAllVenues() {
 
 		return venueToResource(venueService.findAll());
+	}
+	
+	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	public ResponseEntity<?> newVenue() {
+		return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
