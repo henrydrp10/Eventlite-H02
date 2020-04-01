@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import uk.ac.man.cs.eventlite.dao.EventService;
 
-
 @Controller
 @RequestMapping(value = "/", produces = { MediaType.TEXT_HTML_VALUE })
 public class HomeController {
@@ -22,8 +21,10 @@ public class HomeController {
 	public String getThreeUpcomingEvents(Model model) {
 		
 		model.addAttribute("eventsnext", eventService.threeUpcomingEvents());
+		model.addAttribute("venuesnext", eventService.threeMostUsedVenues());
+
 
 		return "../static/index";
 	}
-	
+
 }
