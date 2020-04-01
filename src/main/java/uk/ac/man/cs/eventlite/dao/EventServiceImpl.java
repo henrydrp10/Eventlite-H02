@@ -4,6 +4,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,9 @@ public class EventServiceImpl implements EventService {
 	
 	@Autowired
 	private EventRepository eventRepository;
+	
+    @Autowired
+    private VenueService venueService;
 
 	@Override
 	public long count() {		
@@ -100,36 +104,45 @@ public class EventServiceImpl implements EventService {
 	}
 
 	public Iterable<Venue> threeMostUsedVenues(){
-		Iterable<Event> events = eventRepository.findAll(Sort.by(Sort.Direction.DESC, "name"));
 		
-		// All the venues with how many times they're used by events
-		Map<Venue, Integer> allVenues = new HashMap<Venue, Integer>();
+		Iterable<Event> events = eventRepository.findAll(Sort.by(Sort.Direction.DESC, "name"));
+		int[] venueTimes = new int[((int)venueService.count())];
+		for(int i = 0; i < venueService.count(); i++) {
+			venueTimes[i] = 0;
+		}
+		
+		List<Venue> venueList = new ArrayList<Venue>();
+		List<Venue> mostUsedVenues = new ArrayList<Venue>();
 
 		//Get all Venues and count how many times they're used by events
 		for(Event event : events)
 		{
-			if(!allVenues.containsKey(event.getVenue()))
-			{
-				allVenues.put(event.getVenue(), 0);
+			Venue v = event.getVenue();
+			if(!venueList.contains(v)) {
+				venueList.add(v);
 			}
-			else
-			{
-				allVenues.replace(event.getVenue(), allVenues.get(event.getVenue()) + 1);
-			}
+			venueTimes[venueList.indexOf(v)]++;
 		}
 		
-		// List of the three venues with the most events
-		List<Venue> topThreeUsedVenues = new ArrayList<Venue>();
+		System.out.println(venueList);
+		System.out.println(venueTimes.length);
 		
-		// Finds the three venues with the most events
-		for(int i = 0; i < 3; i++)
-		{
-			Venue mostUsedVenue = Collections.max(allVenues.entrySet(), Map.Entry.comparingByValue()).getKey();
-			topThreeUsedVenues.add(mostUsedVenue);
-			allVenues.remove(mostUsedVenue);
+		
+		int maxIndex;
+		for(int a = 0; a < venueList.size() && a < 3; a++) {
+			maxIndex = 0;
+			for(int i = 0; i < venueTimes.length; i++) {
+				if(venueTimes[i] > venueTimes[maxIndex]) {
+					maxIndex = i;
+				}
+			}
+			if(venueTimes[maxIndex] != -1) {
+				mostUsedVenues.add(venueList.get(maxIndex));
+			}
+			venueTimes[maxIndex] = -1;
 		}
-
-		return topThreeUsedVenues;
+		
+		return mostUsedVenues;
 	}
 
 	@Override

@@ -50,28 +50,27 @@ public class HomeControllerApi {
 		return new Resources<Resource<Event>>(resources, selfLink);
 	}
 	
-	
-	@RequestMapping(method = RequestMethod.GET)
-	public Resources<Resource<Venue>> getThreeMostUsedVenues() {
-
-		return venueToResource(eventService.threeMostUsedVenues());
-	}
-
-	private Resource<Venue> venueToResource(Venue venue) {
-		Link selfLink = linkTo(VenuesControllerApi.class).slash(venue.getId()).withSelfRel();
-
-		return new Resource<Venue>(venue, selfLink);
-	}
-
-	private Resources<Resource<Venue>> venueToResource(Iterable<Venue> venues) {
-		Link selfLink = linkTo(methodOn(VenuesControllerApi.class).getAllVenues()).withSelfRel();
-
-		List<Resource<Venue>> resources = new ArrayList<Resource<Venue>>();
-		for (Venue venue : venues) {
-			resources.add(venueToResource(venue));
-		}
-
-		return new Resources<Resource<Venue>>(resources, selfLink);
-	}
+//	@RequestMapping(method = RequestMethod.GET)
+//	public Resources<Resource<Venue>> getThreeMostUsedVenues() {
+//
+//		return venueToResource(eventService.threeMostUsedVenues());
+//	}
+//
+//	private Resource<Venue> venueToResource(Venue venue) {
+//		Link selfLink = linkTo(VenuesControllerApi.class).slash(venue.getId()).withSelfRel();
+//
+//		return new Resource<Venue>(venue, selfLink);
+//	}
+//
+//	private Resources<Resource<Venue>> venueToResource(Iterable<Venue> venues) {
+//		Link selfLink = linkTo(methodOn(VenuesControllerApi.class).getAllVenues()).withSelfRel();
+//
+//		List<Resource<Venue>> resources = new ArrayList<Resource<Venue>>();
+//		for (Venue venue : venues) {
+//			resources.add(venueToResource(venue));
+//		}
+//
+//		return new Resources<Resource<Venue>>(resources, selfLink);
+//	}
 	
 }
