@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import uk.ac.man.cs.eventlite.entities.Event;
+import uk.ac.man.cs.eventlite.entities.Venue;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -26,6 +27,9 @@ public class EventServiceImpl implements EventService {
 	
 	@Autowired
 	private EventRepository eventRepository;
+	
+    @Autowired
+    private VenueService venueService;
 
 	@Override
 	public long count() {		
@@ -86,6 +90,55 @@ public class EventServiceImpl implements EventService {
 		return futureEvents;
 	}
 	
+	@Override
+	public Iterable<Event> threeUpcomingEvents() {
+		Iterable<Event> futureEvents = findFuture();
+		while (((List<Event>) futureEvents).size() > 3) {
+			int lastIndex = ((List<Event>) futureEvents).size() - 1;
+			((List<Event>) futureEvents).remove(lastIndex);
+		}
+		
+		return futureEvents;
+	}
+
+	public Iterable<Venue> threeMostUsedVenues(){
+		
+		Iterable<Event> events = eventRepository.findAll(Sort.by(Sort.Direction.DESC, "name"));
+		int[] venueTimes = new int[((int)venueService.count())];
+		
+		for (int i = 0; i < venueService.count(); i++)
+			venueTimes[i] = 0;
+		
+		List<Venue> venueList = new ArrayList<Venue>();
+		List<Venue> mostUsedVenues = new ArrayList<Venue>();
+
+		// Get all Venues and count how many times they're used by events
+		for (Event event : events) {
+			Venue v = event.getVenue();
+			
+			if (!venueList.contains(v))
+				venueList.add(v);
+			
+			venueTimes[venueList.indexOf(v)]++;
+		}		
+		
+		int maxIndex;
+		for (int a = 0; a < venueList.size() && a < 3; a++) {
+			
+			maxIndex = 0;
+			for (int i = 0; i < venueTimes.length; i++)
+				if (venueTimes[i] > venueTimes[maxIndex])
+					maxIndex = i;
+			
+			if (venueTimes[maxIndex] != -1)
+				mostUsedVenues.add(venueList.get(maxIndex));
+			
+			venueTimes[maxIndex] = -1;
+		}
+		
+		return mostUsedVenues;
+	}
+
 	@Override
 	public Event save(Event e) {		
 		return eventRepository.save(e);

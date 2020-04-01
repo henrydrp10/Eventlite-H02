@@ -7,7 +7,7 @@ public interface VenueService {
 	public long count();
 
 	public Iterable<Venue> findAll();
-	
+		
 	public Venue save(Venue v);
 	
 	public Venue findOne(long id);

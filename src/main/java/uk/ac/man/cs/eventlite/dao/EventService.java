@@ -1,6 +1,7 @@
 package uk.ac.man.cs.eventlite.dao;
 
 import uk.ac.man.cs.eventlite.entities.Event;
+import uk.ac.man.cs.eventlite.entities.Venue;
 
 public interface EventService {
 
@@ -17,6 +18,11 @@ public interface EventService {
 	public Iterable<Event> findPast();
 	
 	public Iterable<Event> findFuture();
+	
+	public Iterable<Event> threeUpcomingEvents();
 
 	public Iterable<Event> findAllByName(String regex);
+	
+	public Iterable<Venue> threeMostUsedVenues();
+
 }
