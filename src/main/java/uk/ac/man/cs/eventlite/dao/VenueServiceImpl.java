@@ -30,5 +30,9 @@ public class VenueServiceImpl implements VenueService {
 		return venueRepository.findById(id).orElse(null);
 	}
 
+	public Iterable<Venue> findAllByName (String search) {
+		String regex = "\\b" + search.toUpperCase() + "\\b";
+		return venueRepository.findAllByName(regex);
+	}
 
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import uk.ac.man.cs.eventlite.dao.EventService;
@@ -38,6 +39,13 @@ public class VenuesController {
 		model.addAttribute("venuelist", venueService.findAll());
 		
 		return "venues/index";
+	} 
+	
+	@RequestMapping(value = "/byName", method = RequestMethod.GET)
+	public String getVenuesByName(Model model, @RequestParam String search) {
+		
+		model.addAttribute("venues", venueService.findAllByName(search));
+		return "venues/byName";
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)

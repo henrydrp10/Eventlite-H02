@@ -21,6 +21,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import uk.ac.man.cs.eventlite.dao.VenueService;
@@ -56,6 +57,12 @@ public class VenuesControllerApi {
 
 		return ResponseEntity.created(location).build();
 	}
+	
+	@RequestMapping(value = "/byName", method = RequestMethod.GET)
+	public Resources<Resource<Venue>> getVenuesByName(@RequestParam String search) {
+
+		return venueToResource(venueService.findAllByName(search));
+	} 
 
 	private Resource<Venue> venueToResource(Venue venue) {
 		Link selfLink = linkTo(VenuesControllerApi.class).slash(venue.getId()).withSelfRel();
