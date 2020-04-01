@@ -4,10 +4,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -100,6 +97,7 @@ public class EventServiceImpl implements EventService {
 			int lastIndex = ((List<Event>) futureEvents).size() - 1;
 			((List<Event>) futureEvents).remove(lastIndex);
 		}
+		
 		return futureEvents;
 	}
 
@@ -107,38 +105,34 @@ public class EventServiceImpl implements EventService {
 		
 		Iterable<Event> events = eventRepository.findAll(Sort.by(Sort.Direction.DESC, "name"));
 		int[] venueTimes = new int[((int)venueService.count())];
-		for(int i = 0; i < venueService.count(); i++) {
+		
+		for (int i = 0; i < venueService.count(); i++)
 			venueTimes[i] = 0;
-		}
 		
 		List<Venue> venueList = new ArrayList<Venue>();
 		List<Venue> mostUsedVenues = new ArrayList<Venue>();
 
-		//Get all Venues and count how many times they're used by events
-		for(Event event : events)
-		{
+		// Get all Venues and count how many times they're used by events
+		for (Event event : events) {
 			Venue v = event.getVenue();
-			if(!venueList.contains(v)) {
+			
+			if (!venueList.contains(v))
 				venueList.add(v);
-			}
+			
 			venueTimes[venueList.indexOf(v)]++;
-		}
-		
-		System.out.println(venueList);
-		System.out.println(venueTimes.length);
-		
+		}		
 		
 		int maxIndex;
-		for(int a = 0; a < venueList.size() && a < 3; a++) {
+		for (int a = 0; a < venueList.size() && a < 3; a++) {
+			
 			maxIndex = 0;
-			for(int i = 0; i < venueTimes.length; i++) {
-				if(venueTimes[i] > venueTimes[maxIndex]) {
+			for (int i = 0; i < venueTimes.length; i++)
+				if (venueTimes[i] > venueTimes[maxIndex])
 					maxIndex = i;
-				}
-			}
-			if(venueTimes[maxIndex] != -1) {
+			
+			if (venueTimes[maxIndex] != -1)
 				mostUsedVenues.add(venueList.get(maxIndex));
-			}
+			
 			venueTimes[maxIndex] = -1;
 		}
 		
