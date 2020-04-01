@@ -24,5 +24,12 @@ public class VenueServiceImpl implements VenueService {
 	public Venue save(Venue v) {
 		return venueRepository.save(v);
 	}
+	
+	@Override
+	public Iterable<Venue> findAllByName (String search) {
+		String regex = "\\b" + search.toUpperCase() + "\\b";
+		return venueRepository.findAllByName(regex);
+	} 
+
 
 }

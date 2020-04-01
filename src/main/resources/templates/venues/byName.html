@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+  <title>Events that match your search</title>
+</head>
+<body>
+  <div layout:fragment="content">
+    <h1>Events that match your search</h1>
+
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+
+          <th><i class="fas fa-map-marker-alt"></i> Venue</th>
+          
+          <th>Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="e : ${venues}">
+          <td >
+                 <a th:href="@{/venues/{num}(num=${e.id})}" th:text="${e.name}">My Event</a>
+          </td>
+          <td th:text="${e.name}">Event venue</td>      
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+</body>
+</html>
