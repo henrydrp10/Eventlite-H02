@@ -43,16 +43,22 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 		Venue venue1 = new Venue();
 		venue1.setName("Test Venue 1");
 		venue1.setCapacity(1000);
+		venue1.setRoadName("Road 1");
+		venue1.setPostCode("M1 1AA");
 		venueService.save(venue1);
 		
 		Venue venue2 = new Venue();
 		venue2.setName("Test Venue 2");
 		venue2.setCapacity(2000);
+		venue2.setRoadName("Road 2");
+		venue2.setPostCode("M2 2BB");
 		venueService.save(venue2);
 		
 		Venue venue3 = new Venue();
 		venue3.setName("Test Venue 3");
 		venue3.setCapacity(3000);
+		venue3.setRoadName("Road 3");
+		venue3.setPostCode("M3 3CC");
 		venueService.save(venue3);
 		
 		// Create test events

@@ -35,9 +35,9 @@ public class VenuesController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAllVenues(Model model) {
 		
-		model.addAttribute("venues", venueService.findAll());
+		model.addAttribute("venuelist", venueService.findAll());
 		
-		return "events/index";
+		return "venues/index";
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
