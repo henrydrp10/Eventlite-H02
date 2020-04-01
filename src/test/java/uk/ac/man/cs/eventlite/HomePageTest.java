@@ -37,10 +37,12 @@ public class HomePageTest {
 		mvc.perform(get("/").accept(MediaType.TEXT_HTML)).andExpect(status().isOk());
 	}
 
+	/* This test is now unneccessary as we have content on the home page
 	@Test
 	public void getJsonRoot() throws Exception {
 		mvc.perform(get("/").accept(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
 	}
+	*/
 
 	@Test
 	public void getApiRoot() throws Exception {
