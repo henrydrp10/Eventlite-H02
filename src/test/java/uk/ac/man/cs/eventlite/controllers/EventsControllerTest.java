@@ -141,7 +141,7 @@ public class EventsControllerTest {
 
 	@Test
 	public void postEventNoAuth() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.post("/event").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+		mvc.perform(MockMvcRequestBuilders.post("/events").contentType(MediaType.APPLICATION_FORM_URLENCODED)
 				.param("name", "Test Event New").accept(MediaType.TEXT_HTML).with(csrf())).andExpect(status().isFound())
 		.andExpect(header().string("Location", endsWith("/sign-in")));
 
@@ -159,7 +159,7 @@ public class EventsControllerTest {
 
 	@Test
 	public void postEventNoCsrf() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.post("/event").with(user("Rob").roles(Security.ADMIN_ROLE))
+		mvc.perform(MockMvcRequestBuilders.post("/events").with(user("Rob").roles(Security.ADMIN_ROLE))
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED).param("name", "Test Event 1")
 				.accept(MediaType.TEXT_HTML)).andExpect(status().isForbidden());
 
