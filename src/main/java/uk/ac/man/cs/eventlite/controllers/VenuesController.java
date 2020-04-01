@@ -62,7 +62,7 @@ public class VenuesController {
 		venueService.save(venue);
 		redirectAttrs.addFlashAttribute("ok_message", "New venue added.");	
 		
-		return "redirect:/events";
+		return "redirect:/venues";
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)

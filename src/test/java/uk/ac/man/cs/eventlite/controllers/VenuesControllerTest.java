@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -72,6 +73,16 @@ public class VenuesControllerTest {
 		mvc = MockMvcBuilders.standaloneSetup(venuesController).apply(springSecurity(springSecurityFilterChain))
 				.build();
 	}
+	
+	
+	@Test
+	public void getVenue() throws Exception {
+		when(venueService.findOne(1)).thenReturn(venue);
+
+		mvc.perform(MockMvcRequestBuilders.get("/venues/1").accept(MediaType.TEXT_HTML)).andExpect(status().isOk())
+		.andExpect(view().name("venues/venue_details")).andExpect(handler().methodName("showVenueDetails"));
+		verify(venueService).findOne(1);
+	}
 
 	public void getNewVenueNoAuth() throws Exception {		
 		mvc.perform(MockMvcRequestBuilders.post("/venues")
@@ -127,7 +138,7 @@ public class VenuesControllerTest {
 				.param("capacity", "5000")
 				.accept(MediaType.TEXT_HTML).with(csrf()))
 		.andExpect(status().isFound())
-		.andExpect(view().name("redirect:/events")).andExpect(model().hasNoErrors())
+		.andExpect(view().name("redirect:/venues")).andExpect(model().hasNoErrors())
 		.andExpect(handler().methodName("createVenue")).andExpect(flash().attributeExists("ok_message"));
 
 		verify(venueService).save(arg.capture());

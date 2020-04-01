@@ -40,7 +40,7 @@ import uk.ac.man.cs.eventlite.entities.Venue;
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class VenusControllerApiTest {
+public class VenuesControllerApiTest {
 	
 	private final static String BAD_ROLE = "USER";
 

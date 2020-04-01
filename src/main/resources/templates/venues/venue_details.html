@@ -13,9 +13,9 @@
      <blockquote>
   
       <p > <b>Road: </b></p>
-      <p th:text="${venue.roadName} ? '${venue.roadName}' : 'No Data Provided' "></p>
+      <p th:text="${venue.roadName}"></p>
       <p > <b>Post Code: </b></p>
-      <p th:text="${venue.postCode} ? '${venue.postCode}' : 'No Data Provided' "></p>
+      <p th:text="${venue.postCode}"></p>
       <p > <b>Capacity: </b></p>
       <p th:text="${venue.capacity}"></p> 
     </blockquote>
@@ -47,7 +47,7 @@
     </table>
     
 
-    <a class="btn btn-primary" role="button" th:href="@{/events}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
+    <a class="btn btn-primary" role="button" th:href="@{/venues}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
       
   </div>
 
