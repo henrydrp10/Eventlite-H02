@@ -30,6 +30,9 @@ public class Venue {
 	@Min(value = 0, message = "The venue capacity must be a positive integer")
 	private int capacity;
 
+	private double latitude;
+	private double longitude;
+	
 	public Venue() {
 	}
 
@@ -71,5 +74,25 @@ public class Venue {
 
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
+	}
+	
+	public double getLatitude()
+	{
+		return latitude;
+	}
+	
+	public void setLatitude(double latitude)
+	{
+		this.latitude = latitude;
+	}
+	
+	public double getLongitude()
+	{
+		return longitude;
+	}
+	
+	public void setLongitude(double longitude)
+	{
+		this.longitude = longitude;
 	}
 }
