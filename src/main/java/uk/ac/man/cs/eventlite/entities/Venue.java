@@ -2,6 +2,7 @@ package uk.ac.man.cs.eventlite.entities;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -29,7 +30,7 @@ public class Venue {
 
 	@Min(value = 0, message = "The venue capacity must be a positive integer")
 	private int capacity;
-
+		
 	public Venue() {
 	}
 

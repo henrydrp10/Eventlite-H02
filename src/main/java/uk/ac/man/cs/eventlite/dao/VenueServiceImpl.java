@@ -21,6 +21,12 @@ public class VenueServiceImpl implements VenueService {
 	}
 	
 	@Override
+	public void deleteById(long id) {
+		venueRepository.deleteById(id);
+	}
+	
+	
+	@Override
 	public Venue save(Venue v) {
 		return venueRepository.save(v);
 	}

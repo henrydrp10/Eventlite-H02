@@ -9,4 +9,5 @@ public interface VenueRepository extends CrudRepository<Venue, Long>{
 	
 	@Query(value = "SELECT * FROM venues WHERE UPPER(name) REGEXP ?1 ORDER BY name ASC", nativeQuery = true)
 	public Iterable<Venue> findAllByName(String regex);
+    
 }
