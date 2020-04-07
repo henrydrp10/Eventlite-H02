@@ -34,7 +34,7 @@
           <td th:text="${{v.roadName}}">Venue road</td>
           <td th:text="${{v.postCode}}">Venue post code</td>
           <td th:text="${{v.capacity}}">Venue capacity</td>
-          <!--  <td><a th:href="@{/events/updateEvent/{id}(id=${e.id})}"><i class="fas fa-pencil-alt"></i></a></td>-->
+          <td><a th:href="@{/venues/updateVenue/{id}(id=${v.id})}"><i class="fas fa-pencil-alt"></i></a></td>
         </tr>
       </tbody>
     </table>
