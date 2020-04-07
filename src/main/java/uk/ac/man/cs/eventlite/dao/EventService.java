@@ -24,5 +24,7 @@ public interface EventService {
 	public Iterable<Event> findAllByName(String regex);
 	
 	public Iterable<Venue> threeMostUsedVenues();
+	
+	public int numberOfFutureEvents();
 
 }

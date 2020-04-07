@@ -68,32 +68,36 @@
     <div id='map'></div>
 
 <script th:inline="javascript">
+/*<![CDATA[*/
 
+
+var noOfUpcomingEvents = /*[[${num}]]*/ 0;
 L.mapbox.accessToken = 'pk.eyJ1IjoiZXZlbnRsaXRlaDAyIiwiYSI6ImNrOG44NjNrNTBrZGMzbW9jbGRqc3kxbXQifQ.H2MJkZCOBTT-X9_noMmreA';
 var map = L.mapbox.map('map')
-    .setView([53, -2], 6)
+    .setView([0, 0], 6)
     .addLayer(L.mapbox.styleLayer('mapbox://styles/mapbox/streets-v11'));
 
-</script>
-
-<script th:inline="javascript" th:each="e : ${eventsf}">
-/*<![CDATA[*/
-var name = /*[[${e.name}]]*/ 0;
-var lat = /*[[${e.venue.latitude}]]*/ 0;
-var lon = /*[[${e.venue.longitude}]]*/ 0;
 // L.marker is a low-level marker constructor in Leaflet.
 
+//for(int i = 0; i < noOfUpcomingEvents; i++)
+//{
+//   var name = /*[[${eventsf[i].name}]]*/ 0;
+//   var lat = /*[[${eventsf[i].venue.latitude}]]*/ 0;
+//   var lon = /*[[${eventsf[i].venue.longitude}]]*/ 0;
+   
+//   var popup = L.popup()
+//	.setContent('<p>'+name+'</p>');
 
-var popup = L.popup()
-	.setContent('<p>'+name+'</p>');
+//   var marker = L.marker([lat, lon], {
+//             icon: L.mapbox.marker.icon({
+//             'marker-size': 'large',
+//             'marker-symbol': 'bar',
+//             'marker-color': '#fa0'
+//    })
+//    }).bindPopup(popup).addTo(map);
 
-var marker = L.marker([lat, lon], {
-             icon: L.mapbox.marker.icon({
-             'marker-size': 'large',
-             'marker-symbol': 'bar',
-             'marker-color': '#fa0'
-    })
-}).bindPopup(popup).addTo(map);
+}
+
 
 /*]]>*/
 </script>

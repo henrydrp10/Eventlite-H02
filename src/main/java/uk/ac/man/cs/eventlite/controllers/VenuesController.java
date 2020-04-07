@@ -33,6 +33,8 @@ public class VenuesController {
 	@Autowired
 	private EventService eventService;
 	
+	String MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiZXZlbnRsaXRlaDAyIiwiYSI6ImNrOG44NjNrNTBrZGMzbW9jbGRqc3kxbXQifQ.H2MJkZCOBTT-X9_noMmreA";
+	
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAllVenues(Model model) {
 		
@@ -66,9 +68,16 @@ public class VenuesController {
 			
 			return "venues/new";
 		}
+		
+		venue = venueService.updateLatLonIn(venue);  
+				
 
+        
 		venueService.save(venue);
 		redirectAttrs.addFlashAttribute("ok_message", "New venue added.");	
+		
+		System.out.println("After Save lat is : " + venue.getLatitude());
+		System.out.println("After Save lon is : " + venue.getLongitude());
 		
 		return "redirect:/venues";
 	}
