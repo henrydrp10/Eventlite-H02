@@ -28,6 +28,7 @@ import com.mapbox.geojson.Point;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import twitter4j.TwitterException;
 import uk.ac.man.cs.eventlite.config.Persistence;
 import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
@@ -50,7 +51,7 @@ public class EventsController {
 	String MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiZXZlbnRsaXRlaDAyIiwiYSI6ImNrOG44NjNrNTBrZGMzbW9jbGRqc3kxbXQifQ.H2MJkZCOBTT-X9_noMmreA";
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String getAllEvents(Model model) {
+	public String getAllEvents(Model model) throws TwitterException {
 
 		model.addAttribute("events", eventService.findAll());
 		model.addAttribute("venues", venueService.findAll());
@@ -59,6 +60,7 @@ public class EventsController {
 		model.addAttribute("eventsf", eventService.findFuture());
 		
 		model.addAttribute("num",  eventService.numberOfFutureEvents());
+//		model.addAttribute("tweet", eventService.createTweet());
 
 		return "events/index";
 	}

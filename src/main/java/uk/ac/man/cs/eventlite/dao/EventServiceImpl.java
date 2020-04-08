@@ -11,11 +11,25 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
 import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
 
 @Service
 public class EventServiceImpl implements EventService {
+	
+	private Twitter getTwitterinstance() {
+		Twitter mTwitter = new TwitterFactory(new ConfigurationBuilder()
+				.setOAuthConsumerKey("tncy0skFwJ8m1qBaQpH3JgAmi")
+	            .setOAuthConsumerSecret("6rAMplyYeChjfsXn1JbTKsYQICREZj6q7cEaj6qN2OyB35D9ip")
+	            .setOAuthAccessToken("1247927937275494400-BI5mzBrlxmUV2WYuUS1fMr4sJysciq")
+	            .setOAuthAccessTokenSecret("FzLhgApQW8Zm5tIPa0V90qEGhh0iEF2Xt8mub3mPX1C44")
+	            .build()).getInstance();
+		return mTwitter;
+	}
 	
 	@Bean
 	public Clock clock() {
@@ -166,4 +180,13 @@ public class EventServiceImpl implements EventService {
 		for(Event e : futureEvents) num++;
 		return num;
 	}
+	
+//	@Override
+//	public String createTweet() throws TwitterException {
+//		double rand = Math.random();
+//	    Twitter twitter = getTwitterinstance();
+//	    twitter.updateStatus("creating baeldung API " + rand);
+//	    return "done";
+//	}
+	
 }

@@ -140,15 +140,11 @@
     	<groupId>com.fasterxml.jackson.datatype</groupId>
     	<artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.mapbox.mapboxsdk</groupId>
-      <artifactId>mapbox-sdk-services</artifactId>
-      <version>5.0.0</version>
-    </dependency>
+    <dependency> 
+		<groupId>org.twitter4j </groupId> 
+		<artifactId>twitter4j-stream </artifactId> 
+		<version>4.0.6</version> 
+	</dependency> 
   </dependencies>
 
   <build>
