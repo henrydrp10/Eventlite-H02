@@ -70,14 +70,9 @@ public class VenuesController {
 		}
 		
 		venue = venueService.updateLatLonIn(venue);  
-				
-
         
 		venueService.save(venue);
 		redirectAttrs.addFlashAttribute("ok_message", "New venue added.");	
-		
-		System.out.println("After Save lat is : " + venue.getLatitude());
-		System.out.println("After Save lon is : " + venue.getLongitude());
 		
 		return "redirect:/venues";
 	}

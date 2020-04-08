@@ -71,8 +71,6 @@ public class EventsController {
 		model.addAttribute("event", event);
 		model.addAttribute("lat", event.getVenue().getLatitude());
 		model.addAttribute("lon", event.getVenue().getLongitude());
-		System.out.println("lat: " + event.getVenue().getLatitude());
-		System.out.println("lon: " + event.getVenue().getLongitude());
 		
 		return "events/event_details";
 	}
