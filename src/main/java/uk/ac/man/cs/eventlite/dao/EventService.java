@@ -1,5 +1,6 @@
 package uk.ac.man.cs.eventlite.dao;
 
+import twitter4j.TwitterException;
 import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
 
@@ -26,5 +27,7 @@ public interface EventService {
 	public Iterable<Venue> threeMostUsedVenues();
 	
 	public int numberOfFutureEvents();
+
+//	public String createTweet() throws TwitterException;
 
 }
