@@ -27,7 +27,7 @@
       
       <div class="form-group" th:classappend="${#fields.hasErrors('postCode')}? has-error">
         <label for="postCode">Venue postCode:</label>
-        <input class="form-control" type="text" name="postCode" id="postCode" th:field="*{postCodeime}" th:placeholder=${venue.postCode} autofocus="autofocus" />
+        <input class="form-control" type="text" name="postCode" id="postCode" th:field="*{postCode}" th:placeholder=${venue.postCode} autofocus="autofocus" />
         <p class="text-danger" th:if="${#fields.hasErrors('postCode')}" th:errors="*{postCode}">errors</p>
       </div>
       

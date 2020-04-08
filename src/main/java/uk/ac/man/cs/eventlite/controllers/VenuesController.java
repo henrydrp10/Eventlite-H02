@@ -98,7 +98,6 @@ public class VenuesController {
 	 	}
 	 	
 		model.addAttribute("venue", venue);
-		model.addAttribute("venueList", venueService.findAll());
 		
         return "venues/updateVenue";
     }
