@@ -32,7 +32,7 @@ public class Venue {
 
 	private double latitude;
 	private double longitude;
-	
+
 	public Venue() {
 	}
 

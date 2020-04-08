@@ -34,6 +34,12 @@ public class VenueServiceImpl implements VenueService {
 	}
 	
 	@Override
+	public void deleteById(long id) {
+		venueRepository.deleteById(id);
+	}
+	
+	
+	@Override
 	public Venue save(Venue v) {
 		return venueRepository.save(v);
 	}
@@ -67,7 +73,6 @@ public class VenueServiceImpl implements VenueService {
 		  Point firstResultPoint = results.get(0).center();
 		  venue.setLatitude(firstResultPoint.latitude());
 		  venue.setLongitude(firstResultPoint.longitude());
-	      System.out.println(":)) On response : " + firstResultPoint.toString());
 
 		} else {
 

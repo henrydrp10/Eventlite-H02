@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import uk.ac.man.cs.eventlite.dao.EventRepository;
 import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 import uk.ac.man.cs.eventlite.entities.Event;
@@ -30,6 +31,10 @@ public class VenuesController {
 
 	@Autowired
 	private VenueService venueService;
+	
+	@Autowired
+	private EventRepository eventRepository;
+	
 	@Autowired
 	private EventService eventService;
 	
@@ -99,4 +104,24 @@ public class VenuesController {
 		return "venues/venue_details";
 	}
 	
+	 @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+	 public String deleteById(@PathVariable("id") long id) {
+         
+		 boolean venueBelongsToEvent = false;
+		 
+		 Iterable<Event> events = eventRepository.findAll();
+		 
+		 for (Event event : events) {
+				Venue v = event.getVenue();
+				
+				if (v.getId() == id)
+					venueBelongsToEvent = true;
+		 }
+		 
+		 if(!venueBelongsToEvent) {
+		    venueService.deleteById(id);
+		 }
+		 
+		 return "redirect:/venues"; 
+	} 	
 }
