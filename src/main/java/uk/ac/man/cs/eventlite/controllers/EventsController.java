@@ -1,7 +1,11 @@
 package uk.ac.man.cs.eventlite.controllers;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -16,6 +20,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.mapbox.api.geocoding.v5.MapboxGeocoding;
+import com.mapbox.api.geocoding.v5.models.CarmenFeature;
+import com.mapbox.api.geocoding.v5.models.GeocodingResponse;
+import com.mapbox.geojson.Point;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import uk.ac.man.cs.eventlite.config.Persistence;
 import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 
@@ -25,20 +38,27 @@ import uk.ac.man.cs.eventlite.entities.Event;
 @RequestMapping(value = "/events", produces = { MediaType.TEXT_HTML_VALUE })
 
 public class EventsController {
+	
+
 
 	@Autowired
 	private EventService eventService;
 
 	@Autowired
 	private VenueService venueService;
+	
+	String MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiZXZlbnRsaXRlaDAyIiwiYSI6ImNrOG44NjNrNTBrZGMzbW9jbGRqc3kxbXQifQ.H2MJkZCOBTT-X9_noMmreA";
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAllEvents(Model model) {
 
 		model.addAttribute("events", eventService.findAll());
 		model.addAttribute("venues", venueService.findAll());
+		
 		model.addAttribute("eventsp", eventService.findPast());
 		model.addAttribute("eventsf", eventService.findFuture());
+		
+		model.addAttribute("num",  eventService.numberOfFutureEvents());
 
 		return "events/index";
 	}
@@ -47,8 +67,11 @@ public class EventsController {
 	public String showEventDetails(@PathVariable("id") long id, Model model) {
 
 		Event event = eventService.findOne(id);
+		
 		model.addAttribute("event", event);
-
+		model.addAttribute("lat", event.getVenue().getLatitude());
+		model.addAttribute("lon", event.getVenue().getLongitude());
+		
 		return "events/event_details";
 	}
 	

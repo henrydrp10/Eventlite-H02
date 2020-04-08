@@ -159,4 +159,11 @@ public class EventServiceImpl implements EventService {
 	public void deleteById(long id) {
 		eventRepository.deleteById(id);
 	}
+	
+	public int numberOfFutureEvents() {
+		Iterable<Event>  futureEvents = findFuture();
+		int num = 0;
+		for(Event e : futureEvents) num++;
+		return num;
+	}
 }

@@ -74,19 +74,9 @@ public class VenuesControllerTest {
 				.build();
 	}
 	
-	/*
-	@Test
-	public void getVenue() throws Exception {
-		when(venueService.findOne(1)).thenReturn(venue);
+	
 
-		mvc.perform(MockMvcRequestBuilders.get("/venues/1").accept(MediaType.TEXT_HTML))
-		.andExpect(status().isOk())
-		.andExpect(view().name("venues/venue_details"))
-		.andExpect(handler().methodName("showVenueDetails"));
-		
-		verify(venueService).findOne(1);
-	}
-	*/
+	
 
 	public void getNewVenueNoAuth() throws Exception {		
 		mvc.perform(MockMvcRequestBuilders.post("/venues")
@@ -172,4 +162,19 @@ public class VenuesControllerTest {
 
 		verify(venueService, never()).save(venue);
 	}
+	
+	/*
+	@Test
+	public void getVenue() throws Exception {
+		when(venueService.findOne(1)).thenReturn(venue);
+		System.out.println(venue.getName());
+
+		mvc.perform(MockMvcRequestBuilders.get("/venues/1").accept(MediaType.TEXT_HTML))
+		.andExpect(status().isOk())
+		.andExpect(view().name("venues/venue_details"))
+		.andExpect(handler().methodName("showVenueDetails"));
+		
+		verify(venueService).findOne(1);
+	}
+	*/
 }

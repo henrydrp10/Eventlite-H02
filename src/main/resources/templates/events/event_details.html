@@ -1,12 +1,26 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default}">
 <head>
-  <title>Event</title>
+<meta charset=utf-8 />
+ <title>Event</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.mapbox.com/mapbox.js/v3.3.0/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v3.3.0/mapbox.css' rel='stylesheet' />
+
+<style>
+  body { margin:0; padding:0; }
+  #map-container { margin:0; margin-bottom:650px; padding:0; }
+  #map { position:absolute; width:1100px; height:600px }
+  
+  .mapboxgl-popup { max-width: 200px; }
+  .mapboxgl-popup-content { text-align: center; font-family: 'Open Sans', sans-serif; }
+</style>
+
 </head>
 <body>
-  <div layout:fragment="content">
+<div layout:fragment="content">
     <h1 th:text="${event.name}"> Text</h1>
      <blockquote>
       <p > <b>Venue: </b></p>
@@ -36,7 +50,36 @@
       </form>
     </div>
     
-  </div>
 
+    <div id='map-container'><div id='map'></div></div>
+
+	<script th:inline="javascript">
+	/*<![CDATA[*/
+	
+	var lat = /*[[${lat}]]*/ 0;
+	var lon = /*[[${lon}]]*/ 0;
+	var name = /*[[${event.name}]]*/ 'NO name';
+	
+	L.mapbox.accessToken = 'pk.eyJ1IjoiZXZlbnRsaXRlaDAyIiwiYSI6ImNrOG44NjNrNTBrZGMzbW9jbGRqc3kxbXQifQ.H2MJkZCOBTT-X9_noMmreA';
+	var map = L.mapbox.map('map')
+	    .setView([lat, lon], 15)
+	    .addLayer(L.mapbox.styleLayer('mapbox://styles/mapbox/streets-v11'));
+	
+	var popup = L.popup()
+		.setContent('<p>'+name+'</p>');
+	
+	var marker = L.marker([lat, lon], {
+	             icon: L.mapbox.marker.icon({
+	             'marker-size': 'large',
+	             'marker-symbol': 'bar',
+	             'marker-color': '#fa0'
+	    })
+	}).bindPopup(popup).addTo(map);
+	
+	
+	/*]]>*/
+	</script>
+
+  </div>
 </body>
 </html>
