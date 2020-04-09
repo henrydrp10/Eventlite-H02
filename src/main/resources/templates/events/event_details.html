@@ -50,6 +50,16 @@
       </form>
     </div>
     
+     <br>
+       <form th:action="@{/events/tweet/{num}(num=${id})}" th:method="post">
+         <p><b> Share the event </b></p>
+         <input type="text" class="form-control" name="tweet" th:placeholder="${event.name}">
+         <br>
+         <button type="submit" class="btn btn-primary"><i class="fab fa-twitter-square"></i> Send tweet</button>
+       </form>
+   <br><br>
+    
+    
 
     <div id='map-container'><div id='map'></div></div>
 
