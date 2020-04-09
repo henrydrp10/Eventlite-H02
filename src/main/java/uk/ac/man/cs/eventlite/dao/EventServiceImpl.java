@@ -174,19 +174,12 @@ public class EventServiceImpl implements EventService {
 		eventRepository.deleteById(id);
 	}
 	
-	public int numberOfFutureEvents() {
-		Iterable<Event>  futureEvents = findFuture();
-		int num = 0;
-		for(Event e : futureEvents) num++;
-		return num;
+	@Override
+	public String createTweet(String tweet) throws TwitterException {
+
+	    Twitter twitter = getTwitterinstance();
+	    twitter.updateStatus(tweet);
+	    return "done";
 	}
-	
-//	@Override
-//	public String createTweet() throws TwitterException {
-//		double rand = Math.random();
-//	    Twitter twitter = getTwitterinstance();
-//	    twitter.updateStatus("creating baeldung API " + rand);
-//	    return "done";
-//	}
 	
 }

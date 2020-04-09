@@ -26,8 +26,6 @@ public interface EventService {
 	
 	public Iterable<Venue> threeMostUsedVenues();
 	
-	public int numberOfFutureEvents();
-
-//	public String createTweet() throws TwitterException;
+	public String createTweet(String tweet) throws TwitterException;
 
 }

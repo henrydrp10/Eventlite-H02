@@ -59,7 +59,6 @@ public class EventsController {
 		model.addAttribute("eventsp", eventService.findPast());
 		model.addAttribute("eventsf", eventService.findFuture());
 		
-		model.addAttribute("num",  eventService.numberOfFutureEvents());
 //		model.addAttribute("tweet", eventService.createTweet());
 
 		return "events/index";
@@ -155,5 +154,18 @@ public class EventsController {
 		eventService.save(newEvent);
 
 		return "redirect:/events";
+	}
+	
+	@RequestMapping(value="/tweet/{id}", method= RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public String updateStatusOnTwitter(@PathVariable("id") Long id, String tweet) {
+		
+		try {
+			eventService.createTweet(tweet);
+		} catch (TwitterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return "redirect:/events/{id}";
 	}
 }
