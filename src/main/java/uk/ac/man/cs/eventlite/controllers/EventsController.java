@@ -161,7 +161,7 @@ public class EventsController {
 		
 		try {
 			eventService.createTweet(tweet);
-			redirectAttrs.addAttribute("tweetString",tweet);
+			redirectAttrs.addFlashAttribute("tweetString",tweet);
 
 		} catch (TwitterException e) {
 			// TODO Auto-generated catch block
