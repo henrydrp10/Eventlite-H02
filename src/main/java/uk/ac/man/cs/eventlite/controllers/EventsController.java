@@ -157,10 +157,12 @@ public class EventsController {
 	}
 	
 	@RequestMapping(value="/tweet/{id}", method= RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public String updateStatusOnTwitter(@PathVariable("id") Long id, String tweet) {
+	public String updateStatusOnTwitter(@PathVariable("id") Long id, String tweet, RedirectAttributes redirectAttrs) {
 		
 		try {
 			eventService.createTweet(tweet);
+			redirectAttrs.addAttribute("tweetString",tweet);
+
 		} catch (TwitterException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

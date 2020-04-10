@@ -50,15 +50,33 @@
       </form>
     </div>
     
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="successfulTweetAlert">
+  		Your tweet: <strong> ${tweetString} </strong> was posted
+  		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    		<span aria-hidden="true">&times;</span>
+  		</button>
+	</div>
+    
      <br>
        <form th:action="@{/events/tweet/{num}(num=${id})}" th:method="post">
          <p><b> Share the event </b></p>
          <input type="text" class="form-control" name="tweet" th:placeholder="${event.name}">
          <br>
-         <button type="submit" class="btn btn-primary"><i class="fab fa-twitter-square"></i> Send tweet</button>
+         <button id="tweetBtn" type="submit" class="btn btn-primary" onclick="displaySuccessBox()"><i class="fab fa-twitter-square"></i> Send tweet</button>
        </form>
    <br><br>
-    
+   
+    <script th:inline="javascript">
+		function displaySuccessBox()
+		{
+			alert("func");
+			<!-- $('#successfulTweetAlert').removeClass('d-none'); --> <!-- remove hidden from tweet alert-->
+			<!-- $('#successfulTweetAlert').removeClass('show'); --> <!-- show tweet alert -->
+			
+		}
+	</script>
+   
+   
     
 
     <div id='map-container'><div id='map'></div></div>
