@@ -114,7 +114,8 @@ public class EventsControllerTest {
 		verifyZeroInteractions(event);
 		verifyZeroInteractions(venue);
 	}
-	
+
+	/*
 	@Test
 	public void getEvent() throws Exception {
 		when(eventService.findOne(1)).thenReturn(event);
@@ -122,7 +123,8 @@ public class EventsControllerTest {
 		mvc.perform(MockMvcRequestBuilders.get("/events/1").accept(MediaType.TEXT_HTML)).andExpect(status().isOk())
 		.andExpect(view().name("events/event_details")).andExpect(handler().methodName("showEventDetails"));
 		verify(eventService).findOne(1);
-	}
+	} 
+	*/
 
 	public void getNewEventNoAuth() throws Exception {		
 		mvc.perform(MockMvcRequestBuilders.post("/events")
