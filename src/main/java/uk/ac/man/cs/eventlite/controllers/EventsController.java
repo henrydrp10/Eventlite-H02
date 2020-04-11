@@ -1,11 +1,7 @@
 package uk.ac.man.cs.eventlite.controllers;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -20,16 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.mapbox.api.geocoding.v5.MapboxGeocoding;
-import com.mapbox.api.geocoding.v5.models.CarmenFeature;
-import com.mapbox.api.geocoding.v5.models.GeocodingResponse;
-import com.mapbox.geojson.Point;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import twitter4j.TwitterException;
-import uk.ac.man.cs.eventlite.config.Persistence;
 import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 
@@ -59,7 +46,7 @@ public class EventsController {
 		model.addAttribute("eventsp", eventService.findPast());
 		model.addAttribute("eventsf", eventService.findFuture());
 		
-//		model.addAttribute("tweet", eventService.createTweet());
+		model.addAttribute("lastFiveStatuses", eventService.getLastFiveStatusesFromTimeline());
 
 		return "events/index";
 	}

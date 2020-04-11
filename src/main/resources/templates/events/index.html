@@ -124,6 +124,25 @@
       </tbody>
     </table>
     
+    
+    <h1>Twitter feed</h1>
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th><i class="fas fa-calendar"></i> Date posted</th>
+          <th><i class="fab fa-twitter"></i> Tweet</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="status : ${lastFiveStatuses}">
+          <td th:text="${{status.getCreatedAt()}}">Tweet date</td>    
+          <td>
+             <a th:href="@{https://twitter.com/{screenName}/status/{id}(screenName=${status.getUser().getScreenName()}, id=${status.getId()})}" th:text="${{status.getText()}}">Tweet text</a>
+          </td>   
+        </tr>
+      </tbody>
+    </table>
+    
     <p>
       <a class="btn btn-primary" role="button" href="/events/new"><i class="fas fa-plus" aria-hidden="true"></i> Add a new event</a>
     </p>

@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -180,6 +181,24 @@ public class EventServiceImpl implements EventService {
 	    Twitter twitter = getTwitterinstance();
 	    twitter.updateStatus(tweet);
 	    return "done";
+	}
+	
+	@Override
+	public List<Status> getLastFiveStatusesFromTimeline() throws TwitterException {
+
+	    Twitter twitter = getTwitterinstance();
+	    
+	    List<Status> statuses = twitter.getHomeTimeline();
+	    List<Status> lastFiveStatuses = new ArrayList<Status>();
+	    
+	    for (int i = 0; i < 5; i++) {
+	    	try { lastFiveStatuses.add(statuses.get(i)); }
+	    	catch (ArrayIndexOutOfBoundsException exception) {
+	    		break;
+	    	}
+	    }
+	    
+	    return lastFiveStatuses;
 	}
 	
 }
