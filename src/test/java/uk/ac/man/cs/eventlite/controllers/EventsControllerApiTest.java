@@ -122,7 +122,7 @@ public class EventsControllerApiTest {
 	}
 
 	@Test
-	public void postGreetingNoAuth() throws Exception {
+	public void postEventNoAuth() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.post("/api/events").contentType(MediaType.APPLICATION_JSON)
 				.content("{ \"name\": \"Test Event New\" }").accept(MediaType.APPLICATION_JSON))
 		.andExpect(status().isUnauthorized());

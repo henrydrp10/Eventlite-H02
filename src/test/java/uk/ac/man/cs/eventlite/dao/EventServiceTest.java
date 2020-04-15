@@ -24,6 +24,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
+import twitter4j.Status;
+import twitter4j.TwitterException;
 import uk.ac.man.cs.eventlite.EventLite;
 import uk.ac.man.cs.eventlite.entities.Event;
 
@@ -72,6 +74,19 @@ public class EventServiceTest extends AbstractTransactionalJUnit4SpringContextTe
 	    	fixedClock = Clock.fixed(Instant.parse("2020-02-14T7:00:00.00Z"), ZoneId.systemDefault());
 	    doReturn(fixedClock.instant()).when(clock).instant();
 	    doReturn(fixedClock.getZone()).when(clock).getZone();
+	}
+	
+	//Testing twitter list
+	@Test
+	public void testAtMost5TweetsReturn()
+	{
+		try {
+			List<Status> tweets = eventServiceImpl.getLastFiveStatusesFromTimeline();
+			assertTrue(tweets.size() <= 5 && tweets.size() >= 0, "The tweeter feed must have at most 5 tweets");
+		} catch (TwitterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	//testing the findFuture() method.

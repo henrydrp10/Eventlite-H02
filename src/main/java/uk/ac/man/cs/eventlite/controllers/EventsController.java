@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import twitter4j.TwitterException;
 import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 
@@ -25,20 +26,27 @@ import uk.ac.man.cs.eventlite.entities.Event;
 @RequestMapping(value = "/events", produces = { MediaType.TEXT_HTML_VALUE })
 
 public class EventsController {
+	
+
 
 	@Autowired
 	private EventService eventService;
 
 	@Autowired
 	private VenueService venueService;
+	
+	String MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiZXZlbnRsaXRlaDAyIiwiYSI6ImNrOG44NjNrNTBrZGMzbW9jbGRqc3kxbXQifQ.H2MJkZCOBTT-X9_noMmreA";
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String getAllEvents(Model model) {
+	public String getAllEvents(Model model) throws TwitterException {
 
 		model.addAttribute("events", eventService.findAll());
 		model.addAttribute("venues", venueService.findAll());
+		
 		model.addAttribute("eventsp", eventService.findPast());
 		model.addAttribute("eventsf", eventService.findFuture());
+		
+		model.addAttribute("lastFiveStatuses", eventService.getLastFiveStatusesFromTimeline());
 
 		return "events/index";
 	}
@@ -47,8 +55,11 @@ public class EventsController {
 	public String showEventDetails(@PathVariable("id") long id, Model model) {
 
 		Event event = eventService.findOne(id);
+		
 		model.addAttribute("event", event);
-
+		model.addAttribute("lat", event.getVenue().getLatitude());
+		model.addAttribute("lon", event.getVenue().getLongitude());
+		
 		return "events/event_details";
 	}
 	
@@ -130,5 +141,20 @@ public class EventsController {
 		eventService.save(newEvent);
 
 		return "redirect:/events";
+	}
+	
+	@RequestMapping(value="/tweet/{id}", method= RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public String updateStatusOnTwitter(@PathVariable("id") Long id, String tweet, RedirectAttributes redirectAttrs) {
+		
+		try {
+			eventService.createTweet(tweet);
+			redirectAttrs.addFlashAttribute("tweetString",tweet);
+
+		} catch (TwitterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return "redirect:/events/{id}";
 	}
 }

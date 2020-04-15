@@ -39,20 +39,34 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 		
 		// Build and save initial models here.
 		
+		//Please don't do requests for geolocation here.
+		
 		// Create test venues
 		Venue venue1 = new Venue();
 		venue1.setName("Test Venue 1");
 		venue1.setCapacity(1000);
+		venue1.setRoadName("King St");
+		venue1.setPostCode("M2 1NL");
+		venue1.setLatitude(53.481380);
+		venue1.setLongitude(-2.246870);
 		venueService.save(venue1);
 		
 		Venue venue2 = new Venue();
 		venue2.setName("Test Venue 2");
 		venue2.setCapacity(2000);
+		venue2.setRoadName("Oxford Rd");
+		venue2.setPostCode("M13 9GP");
+		venue2.setLatitude(53.465820);
+		venue2.setLongitude(-2.233390);
 		venueService.save(venue2);
 		
 		Venue venue3 = new Venue();
 		venue3.setName("Test Venue 3");
 		venue3.setCapacity(3000);
+		venue3.setRoadName("Portsmouth St");
+		venue3.setPostCode("M13 9GB");
+		venue3.setLatitude(53.463550);
+		venue3.setLongitude(-2.229170);
 		venueService.save(venue3);
 		
 		// Create test events
