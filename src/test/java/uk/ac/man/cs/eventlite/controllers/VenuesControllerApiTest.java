@@ -3,6 +3,7 @@ package uk.ac.man.cs.eventlite.controllers;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
@@ -93,7 +94,20 @@ public class VenuesControllerApiTest {
 				.andExpect(jsonPath("$._links.venue.href", endsWith(uri)))
 				.andExpect(jsonPath("$._links.next3events.href", endsWith(uri+"/next3events")));
 				
-		verify(venueService).findOne(v.getId());
+		verify(venueService, atLeast(1)).findOne(v.getId());
+	}
+	
+	@Test
+	public void showVenueWhenVenueDoesNotExistsTest() throws Exception {
+		
+	
+		when(venueService.findOne(40)).thenReturn(null);
+        String uri = "/api/venues/" + 40;
+        System.out.println(uri);
+		mvc.perform(get(uri).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(handler().methodName("showVenue"));
+				
+		verify(venueService).findOne(40);
 	}
 	
 	@Test
@@ -119,7 +133,7 @@ public class VenuesControllerApiTest {
 				.andExpect(jsonPath("$._links.self.href", endsWith(uri)))
 				.andExpect(jsonPath("$._embedded.events.length()", equalTo(1)));
 
-		verify(venueService).getThreeUpcomingEventsForVenue(v.getId());
+		verify(venueService, atLeast(1)).getThreeUpcomingEventsForVenue(v.getId());
 	}
 	
 	@Test
@@ -138,7 +152,7 @@ public class VenuesControllerApiTest {
 				.andExpect(jsonPath("$._links.self.href", endsWith(uri)));
 				
 
-		verify(venueService).getThreeUpcomingEventsForVenue(v.getId());
+		verify(venueService, atLeast(1)).getThreeUpcomingEventsForVenue(v.getId());
 	}
 	
 	@Test
@@ -190,7 +204,7 @@ public class VenuesControllerApiTest {
 				.andExpect(jsonPath("$._links.self.href", endsWith(uri)))
 				.andExpect(jsonPath("$._embedded.events.length()", equalTo(3)));
 
-		verify(venueService).getThreeUpcomingEventsForVenue(v.getId());
+		verify(venueService, atLeast(1)).getThreeUpcomingEventsForVenue(v.getId());
 	}
 	
 	@Test

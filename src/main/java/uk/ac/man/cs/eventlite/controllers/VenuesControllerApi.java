@@ -53,7 +53,8 @@ public class VenuesControllerApi {
 	
 	@GetMapping(value = "/{venueId}/next3events")
 	public Resources<Resource<Event>> getThreeNextEventsForVenue(@PathVariable final Long venueId) {
-	    List<Event> events = venueService.getThreeUpcomingEventsForVenue(venueId);
+		
+		List<Event> events = venueService.getThreeUpcomingEventsForVenue(venueId);
 	    List<Resource<Event>> resources = new ArrayList<Resource<Event>>();
 	    
 	    for (final Event event : events) {
