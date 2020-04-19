@@ -45,9 +45,10 @@ public class VenuesControllerApi {
 	
 	@GetMapping(value = "/{venueId}")
 	public Resource<Venue> showVenue(@PathVariable final Long venueId) {
+		
+		if(venueService.findOne(venueId)==null) return null;
+		else return venueToResource(venueId); 
 			
-		return venueToResource(venueId);   
-	        
 	}
 	
 	@GetMapping(value = "/{venueId}/next3events")
