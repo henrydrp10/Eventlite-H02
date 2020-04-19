@@ -45,7 +45,7 @@ public class VenuesControllerApi {
 	@GetMapping(value = "/{venueId}")
 	public Resource<Venue> showVenue(@PathVariable final Long venueId) {
 			
-		return null;   
+		return venueToResource(venueId);   
 	        
 	}
 	
@@ -77,6 +77,20 @@ public class VenuesControllerApi {
 		Link selfLink = linkTo(VenuesControllerApi.class).slash(venue.getId()).withSelfRel();
 
 		return new Resource<Venue>(venue, selfLink);
+	}
+	
+	private Resource<Venue> venueToResource(Long venueId) {
+		
+		Link selfLink = linkTo(VenuesControllerApi.class).slash(venueId).withSelfRel();
+		
+		Link venueLink = linkTo(methodOn(VenuesControllerApi.class)
+				  .showVenue(venueId)).withRel("venue");
+		
+		//Links that only show up in venue/id page should be added here
+		//Link next3events = ...
+		//Link events = ...
+
+		return new Resource<Venue>(venueService.findOne(venueId), selfLink, venueLink);
 	}
 
 	private Resources<Resource<Venue>> venueToResource(Iterable<Venue> venues) {
