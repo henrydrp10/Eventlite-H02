@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import uk.ac.man.cs.eventlite.dao.VenueService;
+import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
 
 @RestController
@@ -47,6 +48,11 @@ public class VenuesControllerApi {
 			
 		return venueToResource(venueId);   
 	        
+	}
+	
+	@GetMapping(value = "/{venueId}/next3Events")
+	public Resources<Resource<Event>> getThreeNextEventsForVenue(@PathVariable final Long venueId) {
+	    return null;
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)

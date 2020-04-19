@@ -95,6 +95,32 @@ public class VenuesControllerApiTest {
 	}
 	
 	@Test
+	public void getNext3eventsPerVenue() throws Exception {
+		
+		Venue v = new Venue();
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		
+		Event e = new Event();
+		e.setId(0);
+		e.setName("Event");
+		e.setDate(LocalDate.now().plusDays(1));
+		e.setTime(LocalTime.now());
+		e.setVenue(v);
+		
+		when(venueService.getThreeUpcomingEventsForVenue(v.getId())).thenReturn(Collections.<Event>singletonList(e));
+        String uri = "/api/venues/" + v.getId() + "/next3Events";
+        System.out.println(uri);
+		mvc.perform(get(uri).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(handler().methodName("getThreeNextEventsForVenue")).andExpect(jsonPath("$.length()", equalTo(2)))
+				.andExpect(jsonPath("$._links.self.href", endsWith(uri)))
+				.andExpect(jsonPath("$._embedded.events.length()", equalTo(1)));
+
+		verify(venueService).getThreeUpcomingEventsForVenue(v.getId());
+	}
+	
+	@Test
 	public void getNewVenue() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.get("/api/venues/new").accept(MediaType.APPLICATION_JSON))
 		.andExpect(status().isNotAcceptable()).andExpect(handler().methodName("newVenue"));
