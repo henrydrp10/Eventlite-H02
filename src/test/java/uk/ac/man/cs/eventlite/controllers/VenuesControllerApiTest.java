@@ -89,7 +89,8 @@ public class VenuesControllerApiTest {
 		mvc.perform(get(uri).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 				.andExpect(handler().methodName("showVenue")).andExpect(jsonPath("$.length()", equalTo(7)))
 				.andExpect(jsonPath("$._links.self.href", endsWith(uri)))
-				.andExpect(jsonPath("$._links.venue.href", endsWith(uri)));
+				.andExpect(jsonPath("$._links.venue.href", endsWith(uri)))
+				.andExpect(jsonPath("$._links.next3events.href", endsWith(uri+"/next3events")));
 				
 		verify(venueService).findOne(v.getId());
 	}
@@ -110,8 +111,8 @@ public class VenuesControllerApiTest {
 		e.setVenue(v);
 		
 		when(venueService.getThreeUpcomingEventsForVenue(v.getId())).thenReturn(Collections.<Event>singletonList(e));
-        String uri = "/api/venues/" + v.getId() + "/next3Events";
-        System.out.println(uri);
+        String uri = "/api/venues/" + v.getId() + "/next3events";
+        
 		mvc.perform(get(uri).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 				.andExpect(handler().methodName("getThreeNextEventsForVenue")).andExpect(jsonPath("$.length()", equalTo(2)))
 				.andExpect(jsonPath("$._links.self.href", endsWith(uri)))

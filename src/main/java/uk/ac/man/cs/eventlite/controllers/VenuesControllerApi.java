@@ -50,9 +50,21 @@ public class VenuesControllerApi {
 	        
 	}
 	
-	@GetMapping(value = "/{venueId}/next3Events")
+	@GetMapping(value = "/{venueId}/next3events")
 	public Resources<Resource<Event>> getThreeNextEventsForVenue(@PathVariable final Long venueId) {
-	    return null;
+	    List<Event> events = venueService.getThreeUpcomingEventsForVenue(venueId);
+	    List<Resource<Event>> resources = new ArrayList<Resource<Event>>();
+	    
+	    for (final Event event : events) {
+	    	
+	        resources.add(eventToResource(event));
+	        
+	    }
+	  
+	    Link link = linkTo(methodOn(VenuesControllerApi.class)
+	      .getThreeNextEventsForVenue(venueId)).withSelfRel();
+	    Resources<Resource<Event>> result = new Resources<Resource<Event>>(resources, link);
+	    return result;
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -93,10 +105,12 @@ public class VenuesControllerApi {
 				  .showVenue(venueId)).withRel("venue");
 		
 		//Links that only show up in venue/id page should be added here
-		//Link next3events = ...
+		Link next3eventsLink = linkTo(methodOn(VenuesControllerApi.class)
+				  .getThreeNextEventsForVenue(venueId)).withRel("next3events");
+		
 		//Link events = ...
 
-		return new Resource<Venue>(venueService.findOne(venueId), selfLink, venueLink);
+		return new Resource<Venue>(venueService.findOne(venueId), selfLink, venueLink, next3eventsLink);
 	}
 
 	private Resources<Resource<Venue>> venueToResource(Iterable<Venue> venues) {
@@ -108,5 +122,11 @@ public class VenuesControllerApi {
 		}
 
 		return new Resources<Resource<Venue>>(resources, selfLink);
+	}
+	
+	private Resource<Event> eventToResource(Event event) {
+		Link selfLink = linkTo(EventsControllerApi.class).slash(event.getId()).withSelfRel();
+
+		return new Resource<Event>(event, selfLink);
 	}
 }
