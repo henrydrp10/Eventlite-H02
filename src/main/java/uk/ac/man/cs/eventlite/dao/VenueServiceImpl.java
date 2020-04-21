@@ -1,5 +1,6 @@
 package uk.ac.man.cs.eventlite.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import com.mapbox.geojson.Point;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
 
 @Service
@@ -99,6 +101,28 @@ public class VenueServiceImpl implements VenueService {
 		}
         
         return venue;
+	}
+	
+	@Autowired
+	private EventService eventService;
+	
+	@Override
+	public List<Event> getThreeUpcomingEventsForVenue(Long venueId) {
+
+		Iterable<Event> futureEvents = eventService.findFuture();
+		
+		List<Event> returnList = new ArrayList<Event>();
+		int i = 0;
+		for( Event event : futureEvents )
+		{
+			if(event.getVenue().getId() == venueId && i<3)
+			{
+				i++;
+				returnList.add(event);
+				
+			}
+		}
+		return returnList;
 	}
 	
 	
