@@ -51,6 +51,24 @@ public class VenuesControllerApi {
 			
 	}
 	
+	@GetMapping(value = "/{venueId}/events")
+	public Resources<Resource<Event>> getEventsForVenue(@PathVariable final Long venueId) {
+		
+		List<Event> events = venueService.getEventsForVenue(venueId);
+	    List<Resource<Event>> resources = new ArrayList<Resource<Event>>();
+	    
+	    for (final Event event : events) {
+	    	
+	        resources.add(eventToResource(event));
+	        
+	    }
+	  
+	    Link link = linkTo(methodOn(VenuesControllerApi.class)
+	      .getEventsForVenue(venueId)).withSelfRel();
+	    Resources<Resource<Event>> result = new Resources<Resource<Event>>(resources, link);
+	    return result;
+	} 
+	
 	@GetMapping(value = "/{venueId}/next3events")
 	public Resources<Resource<Event>> getThreeNextEventsForVenue(@PathVariable final Long venueId) {
 		
@@ -111,9 +129,11 @@ public class VenuesControllerApi {
 				  .getThreeNextEventsForVenue(venueId)).withRel("next3events");
 		
 		//Link events = ...
+		Link eventsForVenue = linkTo(methodOn(VenuesControllerApi.class)
+				  .getThreeNextEventsForVenue(venueId)).withRel("events");
 
-		return new Resource<Venue>(venueService.findOne(venueId), selfLink, venueLink, next3eventsLink);
-	}
+		return new Resource<Venue>(venueService.findOne(venueId), selfLink, venueLink, next3eventsLink);	
+		}
 
 	private Resources<Resource<Venue>> venueToResource(Iterable<Venue> venues) {
 		Link selfLink = linkTo(methodOn(VenuesControllerApi.class).getAllVenues()).withSelfRel();

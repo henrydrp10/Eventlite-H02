@@ -1,5 +1,7 @@
 package uk.ac.man.cs.eventlite.dao;
+import java.util.List;
 
+import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
 
 public interface VenueService {
@@ -19,5 +21,7 @@ public interface VenueService {
 	public Iterable<Venue> findAllByName(String regex);
 	
 	public List<Event> getThreeUpcomingEventsForVenue(Long venueId) ;
+	
+	public List<Event> getEventsForVenue(Long venueId);
 	
 }
