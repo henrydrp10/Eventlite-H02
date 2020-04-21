@@ -146,27 +146,5 @@ public class VenueServiceImpl implements VenueService {
 	   		
 	   		return eventsAtThisVenue;
 	   	} 
-	
-/*	@Override
-	public List<Event> getEventsForVenue(Long venueId) {
-
-		Iterable<Event> futureEvents = eventService.findFuture();
 		
-		List<Event> returnList = new ArrayList<Event>();
-		int i = 0;
-		for( Event event : futureEvents )
-		{
-			if(event.getVenue().getId() == venueId)
-			{
-				i++;
-				returnList.add(event);
-				
-			}
-		}
-		return returnList;
-	}  */
-
-	
-	
-
 }

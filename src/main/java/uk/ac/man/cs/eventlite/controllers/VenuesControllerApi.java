@@ -130,7 +130,7 @@ public class VenuesControllerApi {
 		
 		//Link events = ...
 		Link eventsForVenue = linkTo(methodOn(VenuesControllerApi.class)
-				  .getThreeNextEventsForVenue(venueId)).withRel("events");
+				  .getEventsForVenue(venueId)).withRel("events");
 
 		return new Resource<Venue>(venueService.findOne(venueId), selfLink, venueLink, next3eventsLink, eventsForVenue);	
 		}

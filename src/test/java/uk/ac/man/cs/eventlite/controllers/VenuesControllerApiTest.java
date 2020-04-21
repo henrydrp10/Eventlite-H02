@@ -208,6 +208,114 @@ public class VenuesControllerApiTest {
 	}
 	
 	@Test
+	public void getEventsPerVenueWhenNoEvents() throws Exception {
+		
+		Venue v = new Venue();
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		
+		when(venueService.getEventsForVenue(v.getId())).thenReturn(new ArrayList<Event>());
+        String uri = "/api/venues/" + v.getId() + "/events";
+        
+		mvc.perform(get(uri).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(handler().methodName("getEventsForVenue")).andExpect(jsonPath("$.length()", equalTo(1)))
+				.andExpect(jsonPath("$._links.self.href", endsWith(uri)));
+				
+
+		verify(venueService, atLeast(1)).getEventsForVenue(v.getId());
+	}
+	
+	@Test
+	public void getNextPerVenueWhen2Events() throws Exception {
+		
+		Venue v = new Venue();
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		
+		Event e1 = new Event();
+		e1.setId(0);
+		e1.setName("Event");
+		e1.setDate(LocalDate.now().plusDays(1));
+		e1.setTime(LocalTime.now());
+		e1.setVenue(v);
+		
+		Event e2 = new Event();
+		e2.setId(1);
+		e2.setName("Event");
+		e2.setDate(LocalDate.now().plusDays(1));
+		e2.setTime(LocalTime.now());
+		e2.setVenue(v);
+		
+		ArrayList<Event> Events = new ArrayList<Event>();
+		Events.add(e1);
+		Events.add(e2);
+				
+		when(venueService.getEventsForVenue(v.getId())).thenReturn(Events);
+        String uri = "/api/venues/" + v.getId() + "/events";
+        
+		mvc.perform(get(uri).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(handler().methodName("getEventsForVenue")).andExpect(jsonPath("$.length()", equalTo(2)))
+				.andExpect(jsonPath("$._links.self.href", endsWith(uri)));
+
+		verify(venueService, atLeast(1)).getEventsForVenue(v.getId());
+	} 
+	
+	@Test
+	public void getEventsPerVenue4Events() throws Exception {
+		
+		Venue v = new Venue();
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		
+		Event e1 = new Event();
+		e1.setId(0);
+		e1.setName("Event");
+		e1.setDate(LocalDate.now().plusDays(1));
+		e1.setTime(LocalTime.now());
+		e1.setVenue(v);
+		
+		Event e2 = new Event();
+		e2.setId(1);
+		e2.setName("Event");
+		e2.setDate(LocalDate.now().plusDays(1));
+		e2.setTime(LocalTime.now());
+		e2.setVenue(v);
+		
+		Event e3 = new Event();
+		e3.setId(2);
+		e3.setName("Event");
+		e3.setDate(LocalDate.now().plusDays(1));
+		e3.setTime(LocalTime.now());
+		e3.setVenue(v);
+		
+		Event e4 = new Event();
+		e4.setId(3);
+		e4.setName("Event");
+		e4.setDate(LocalDate.now().plusDays(1));
+		e4.setTime(LocalTime.now());
+		e4.setVenue(v);
+		
+		ArrayList<Event> Events = new ArrayList<Event>();
+		Events.add(e1);
+		Events.add(e2);
+		Events.add(e3);
+		Events.add(e4);
+		
+		when(venueService.getThreeUpcomingEventsForVenue(v.getId())).thenReturn(Events);
+        String uri = "/api/venues/" + v.getId() + "/events";
+        
+		mvc.perform(get(uri).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(handler().methodName("getEventsForVenue")).andExpect(jsonPath("$.length()", equalTo(1)))
+				.andExpect(jsonPath("$._links.self.href", endsWith(uri)));
+			
+
+		verify(venueService, atLeast(1)).getEventsForVenue(v.getId());
+	}
+	
+	@Test
 	public void getNewVenue() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.get("/api/venues/new").accept(MediaType.APPLICATION_JSON))
 		.andExpect(status().isNotAcceptable()).andExpect(handler().methodName("newVenue"));
