@@ -18,4 +18,6 @@ public interface VenueService {
 
 	public Iterable<Venue> findAllByName(String regex);
 	
+	public List<Event> getThreeUpcomingEventsForVenue(Long venueId) ;
+	
 }
