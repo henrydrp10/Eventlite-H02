@@ -1,5 +1,7 @@
 package uk.ac.man.cs.eventlite.controllers;
 
+import static org.hamcrest.Matchers.endsWith;
+
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
@@ -7,6 +9,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.ac.man.cs.eventlite.testutil.MessageConverterUtil.getMessageConverters;
 
@@ -122,4 +125,14 @@ public class VenuesControllerApiTest {
 
 		verify(venueService, never()).save(venue);
 	}
+	
+	@Test
+	public void selfAndProfileLink() throws Exception {
+		mvc.perform(
+				MockMvcRequestBuilders.get("/api/venues").accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$._links.self.href", endsWith("api/venues")))
+		.andExpect(jsonPath("$._links.profile.href", endsWith("/api/profile/venues")));
+	}
+	
 }
