@@ -1,5 +1,6 @@
 package uk.ac.man.cs.eventlite.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,9 @@ import com.mapbox.geojson.Point;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
-
+import uk.ac.man.cs.eventlite.entities.Event;
 @Service
 public class VenueServiceImpl implements VenueService {
 	
@@ -22,7 +24,10 @@ public class VenueServiceImpl implements VenueService {
 	
 	@Autowired
 	private VenueRepository venueRepository;
-
+	
+	@Autowired
+	private EventRepository eventRepository;
+	
 	@Override
 	public long count() {
 		return venueRepository.count();
@@ -83,7 +88,9 @@ public class VenueServiceImpl implements VenueService {
 
 		}
 	}
-
+	       
+	  
+	    
 	@Override
 	public void onFailure(Call<GeocodingResponse> call, Throwable throwable) {
 		throwable.printStackTrace();
@@ -101,6 +108,43 @@ public class VenueServiceImpl implements VenueService {
         return venue;
 	}
 	
+	@Autowired
+	private EventService eventService;
 	
+	@Override
+	public List<Event> getThreeUpcomingEventsForVenue(Long venueId) {
 
+		Iterable<Event> futureEvents = eventService.findFuture();
+		
+		List<Event> returnList = new ArrayList<Event>();
+		int i = 0;
+		for( Event event : futureEvents )
+		{
+			if(event.getVenue().getId() == venueId && i<3)
+			{
+				i++;
+				returnList.add(event);
+				
+			}
+		}
+		
+		return returnList;
+	}
+	
+	  @Override
+	   	public List<Event> getEventsForVenue(Long venueId){
+	   		Iterable<Event> events = eventRepository.findAll();
+	   		
+	   		List<Event> eventsAtThisVenue = new ArrayList<Event>();
+	   		
+	   		for (Event event : events)
+	   		{   
+	   			Venue venueAtThisEvent = event.getVenue();
+	   			if (venueAtThisEvent.getId() == venueId)
+	   				eventsAtThisVenue.add(event);
+	   		}
+	   		
+	   		return eventsAtThisVenue;
+	   	} 
+		
 }
