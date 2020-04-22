@@ -2,6 +2,7 @@ package uk.ac.man.cs.eventlite.controllers;
 
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
+
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
@@ -372,4 +373,14 @@ public class VenuesControllerApiTest {
 
 		verify(venueService, never()).save(venue);
 	}
+	
+	@Test
+	public void selfAndProfileLink() throws Exception {
+		mvc.perform(
+				MockMvcRequestBuilders.get("/api/venues").accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$._links.self.href", endsWith("api/venues")))
+		.andExpect(jsonPath("$._links.profile.href", endsWith("/api/profile/venues")));
+	}
+	
 }
