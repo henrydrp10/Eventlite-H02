@@ -19,6 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 
 import javax.servlet.Filter;
@@ -175,7 +177,7 @@ public class EventsControllerTest {
 		mvc.perform(MockMvcRequestBuilders.post("/events").with(user("Rob").roles(Security.ADMIN_ROLE))
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 				.param("name", "Test Event New")
-				.param("date", "2020-04-22")
+				.param("date", LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
 				.param("venue", venue.getName())
 				.accept(MediaType.TEXT_HTML).with(csrf()))
 		.andExpect(status().isFound())
