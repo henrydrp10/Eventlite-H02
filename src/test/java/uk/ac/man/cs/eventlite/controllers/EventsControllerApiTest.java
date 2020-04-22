@@ -1,6 +1,7 @@
 package uk.ac.man.cs.eventlite.controllers;
 
 import static org.hamcrest.Matchers.endsWith;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -27,6 +28,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import static org.mockito.Mockito.times;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -211,12 +214,12 @@ public class EventsControllerApiTest {
         String uri = "/api/events/" + e.getId();
         System.out.println(uri);
 		mvc.perform(get(uri).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-				.andExpect(handler().methodName("showEvent")).andExpect(jsonPath("$.length()", equalTo(10)))
+				.andExpect(handler().methodName("showEvent")).andExpect(jsonPath("$.length()", equalTo(7)))
 				.andExpect(jsonPath("$._links.self.href", endsWith(uri)))
 				.andExpect(jsonPath("$._links.event.href", endsWith(uri)))
 				.andExpect(jsonPath("$._links.venue.href", endsWith(uri + "/venue")));
 						
-		verify(eventService).findOne(e.getId());
+		verify(eventService,  times(2)).findOne(e.getId());
 	}
 
 }

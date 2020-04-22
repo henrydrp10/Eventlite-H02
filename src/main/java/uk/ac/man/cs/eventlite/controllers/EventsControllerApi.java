@@ -67,24 +67,29 @@ public class EventsControllerApi {
 		return ResponseEntity.created(location).build();
 	}
 	
-	@GetMapping(value = "/events")
-	public Resource<Event> showEvent(@PathVariable final Event event) {
+	@GetMapping(value = "/{eventId}")
+	public Resource<Event> showEvent(@PathVariable final Long eventId) {
 		
-		if(eventService.findOne(event.getId())==null) 
+		if(eventService.findOne(eventId)==null) 
 			return null;
 		else 
-			return eventToResource(event);   		        
+			return eventToResource(eventId);   		        
+	}
+	
+	private Resource<Event> eventToResource(Long eventId) {
+		Link selfLink = linkTo(EventsControllerApi.class).slash(eventId).withSelfRel();
+		Link eventLink = linkTo(methodOn(EventsControllerApi.class).showEvent(eventId)).withRel("event");
+		Link venueLink = linkTo(EventsControllerApi.class).slash(eventId).slash("venue").withRel("venue");
+
+		return new Resource<Event>(eventService.findOne(eventId), selfLink,eventLink, venueLink);
 	}
 
 
 	private Resource<Event> eventToResource(Event event) {
 		Link selfLink = linkTo(EventsControllerApi.class).slash(event.getId()).withSelfRel();
-		Link eventLink = linkTo(EventsControllerApi.class).slash(event.getId()).withRel("event");
-		Link venueLink = linkTo(EventsControllerApi.class).slash(event.getId()).slash("venue").withRel("venue");
 
 
-
-		return new Resource<Event>(event, selfLink,eventLink, venueLink);
+		return new Resource<Event>(event, selfLink);
 	}
 
 	private Resources<Resource<Event>> eventToResource(Iterable<Event> events) {
