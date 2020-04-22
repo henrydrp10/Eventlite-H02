@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -64,11 +66,25 @@ public class EventsControllerApi {
 
 		return ResponseEntity.created(location).build();
 	}
+	
+	@GetMapping(value = "/events")
+	public Resource<Event> showEvent(@PathVariable final Event event) {
+		
+		if(eventService.findOne(event.getId())==null) 
+			return null;
+		else 
+			return eventToResource(event);   		        
+	}
+
 
 	private Resource<Event> eventToResource(Event event) {
 		Link selfLink = linkTo(EventsControllerApi.class).slash(event.getId()).withSelfRel();
+		Link eventLink = linkTo(EventsControllerApi.class).slash(event.getId()).withRel("event");
+		Link venueLink = linkTo(EventsControllerApi.class).slash(event.getId()).slash("venue").withRel("venue");
 
-		return new Resource<Event>(event, selfLink);
+
+
+		return new Resource<Event>(event, selfLink,eventLink, venueLink);
 	}
 
 	private Resources<Resource<Event>> eventToResource(Iterable<Event> events) {

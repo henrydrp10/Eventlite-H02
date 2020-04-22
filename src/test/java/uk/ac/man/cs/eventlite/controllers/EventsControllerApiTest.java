@@ -186,4 +186,37 @@ public class EventsControllerApiTest {
 
 		verify(eventService, never()).save(event);
 	}
+	
+	@Test
+	public void showEventTest() throws Exception {
+		
+		Venue v = new Venue();
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		
+		Event e = new Event();
+		e.setId(10);
+		e.setName("Event");
+		e.setDate(LocalDate.now());
+		e.setTime(LocalTime.now());
+		e.setVenue(v);
+		e.setSummary("Summary");
+		e.setDescription("Description");
+		eventService.save(e);
+
+		
+		when(eventService.findOne(e.getId())).thenReturn(e);
+
+        String uri = "/api/events/" + e.getId();
+        System.out.println(uri);
+		mvc.perform(get(uri).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(handler().methodName("showEvent")).andExpect(jsonPath("$.length()", equalTo(10)))
+				.andExpect(jsonPath("$._links.self.href", endsWith(uri)))
+				.andExpect(jsonPath("$._links.event.href", endsWith(uri)))
+				.andExpect(jsonPath("$._links.venue.href", endsWith(uri + "/venue")));
+						
+		verify(eventService).findOne(e.getId());
+	}
+
 }
