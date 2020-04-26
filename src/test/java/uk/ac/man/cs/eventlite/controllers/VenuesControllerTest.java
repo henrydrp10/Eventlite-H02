@@ -162,10 +162,17 @@ public class VenuesControllerTest {
 		verify(venueService, never()).save(venue);
 	}
 	
-	/*
+/*	
 	@Test
 	public void getVenue() throws Exception {
-		when(venueService.findOne(1)).thenReturn(venue);
+		Venue v = new Venue();
+		v.setId(1);
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		long id = 1;
+		
+		when(venueService.findOne(id)).thenReturn(venue);
 		System.out.println(venue.getName());
 
 		mvc.perform(MockMvcRequestBuilders.get("/venues/1").accept(MediaType.TEXT_HTML))

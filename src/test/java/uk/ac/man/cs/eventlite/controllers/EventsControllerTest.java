@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 
@@ -117,16 +118,28 @@ public class EventsControllerTest {
 		verifyZeroInteractions(venue);
 	}
 
-	/*
+	
 	@Test
 	public void getEvent() throws Exception {
-		when(eventService.findOne(1)).thenReturn(event);
+	    Venue v = new Venue();
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		
+		Event e = new Event();
+		e.setId(1);
+		e.setName("Event");
+		e.setDate(LocalDate.now());
+		e.setTime(LocalTime.now());
+		e.setVenue(v);
+		long id = e.getId();
+		when(eventService.findOne(id)).thenReturn(e);
 
-		mvc.perform(MockMvcRequestBuilders.get("/events/1").accept(MediaType.TEXT_HTML)).andExpect(status().isOk())
+		mvc.perform(MockMvcRequestBuilders.get("/events/"+id).accept(MediaType.TEXT_HTML)).andExpect(status().isOk())
 		.andExpect(view().name("events/event_details")).andExpect(handler().methodName("showEventDetails"));
-		verify(eventService).findOne(1);
-	} 
-	*/
+		verify(eventService).findOne(id);
+	}
+	
 
 	public void getNewEventNoAuth() throws Exception {		
 		mvc.perform(MockMvcRequestBuilders.post("/events")
