@@ -138,7 +138,7 @@ public class VenuesControllerApi {
 
 	private Resources<Resource<Venue>> venueToResource(Iterable<Venue> venues) {
 		Link selfLink = linkTo(methodOn(VenuesControllerApi.class).getAllVenues()).withSelfRel();
-		Link profileLink = linkTo(Hateoas.class).slash("api").slash("profile").slash("venues").withRel("profile");
+		Link profileLink = linkTo(ProfileControllerApi.class).slash("venues").withRel("profile");
 
 		List<Resource<Venue>> resources = new ArrayList<Resource<Venue>>();
 		for (Venue venue : venues) {
