@@ -124,7 +124,7 @@ public class VenuesControllerTest {
 		verify(venueService, never()).save(venue);
 	}
 
-	/*
+	
 	@Test
 	public void postVenue() throws Exception {
 		ArgumentCaptor<Venue> arg = ArgumentCaptor.forClass(Venue.class);
@@ -141,9 +141,9 @@ public class VenuesControllerTest {
 		.andExpect(handler().methodName("createVenue")).andExpect(flash().attributeExists("ok_message"));
 
 		verify(venueService).save(arg.capture());
-		assertThat("Test Venue New", equalTo(arg.getValue().getName()));
+		verify(venueService).updateLatLonIn(arg.capture());
 	}
-	*/
+	
 
 	@Test
 	public void postLongVenue() throws Exception {

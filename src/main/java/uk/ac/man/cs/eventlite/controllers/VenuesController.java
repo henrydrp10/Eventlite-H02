@@ -142,7 +142,7 @@ public class VenuesController {
     }
 
 	@RequestMapping(value="/update/{id}", method= RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public String putEvent(@PathVariable("id") Long id, Venue venue) {
+	public String putVenue(@PathVariable("id") Long id, Venue venue) {
 		 
 		Venue newVenue = venueService.findOne(id);
 		newVenue.setName(venue.getName());

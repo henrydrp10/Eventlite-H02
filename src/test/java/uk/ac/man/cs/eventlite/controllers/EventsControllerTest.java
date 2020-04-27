@@ -201,19 +201,6 @@ public class EventsControllerTest {
 		assertThat("Test Event New", equalTo(arg.getValue().getName()));
 	}
 
-	/*
-	@Test
-	public void postBadEvent() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.post("/events").with(user("Rob").roles(Security.ADMIN_ROLE))
-				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-				.param("name", "<Something bad>").accept(MediaType.TEXT_HTML).with(csrf()))
-		.andExpect(status().isOk()).andExpect(view().name("events/new"))
-		.andExpect(model().attributeHasFieldErrors("event", "name"))
-		.andExpect(handler().methodName("createEvent")).andExpect(flash().attributeCount(0));
-
-		verify(eventService, never()).save(event);
-	} 
-	*/
 
 	@Test
 	public void postLongEvent() throws Exception {
@@ -272,4 +259,40 @@ public class EventsControllerTest {
 	
 		verify(eventService, never()).deleteById(1);
 	}
+
+	
+	@Test
+	public void postTweet() throws Exception {
+		
+		Venue v = new Venue();
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		
+		
+		Event e = new Event();
+		e.setId(1);
+		e.setName("Event");
+		e.setDate(LocalDate.now());
+		e.setTime(LocalTime.now());
+		e.setVenue(v);
+		long id = e.getId();
+		
+		int randomNum = 1 + (int)(Math.random() * 100);
+		
+		String tweet = Integer.toString(randomNum);
+		
+		when(eventService.findOne(id)).thenReturn(e);
+
+		mvc.perform(MockMvcRequestBuilders.post("/events/tweet/"+id).with(user("Rob").roles(Security.ADMIN_ROLE))
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("tweet", tweet)
+				.accept(MediaType.TEXT_HTML).with(csrf()))
+		.andExpect(status().isFound())
+		.andExpect(view().name("redirect:/events/{id}")).andExpect(model().hasNoErrors())
+		.andExpect(handler().methodName("updateStatusOnTwitter")).andExpect(flash().attributeExists("tweetString"));
+
+		verify(eventService).createTweet(tweet);
+	}
+	
 }
