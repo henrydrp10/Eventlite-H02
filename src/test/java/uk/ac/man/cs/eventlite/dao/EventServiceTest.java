@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
@@ -15,6 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +39,10 @@ import uk.ac.man.cs.eventlite.entities.Event;
 @DirtiesContext
 @ActiveProfiles("test")
 public class EventServiceTest extends AbstractTransactionalJUnit4SpringContextTests {
-
-	//@InjectMocks
-	//private EventService eventService;
+	
+	@InjectMocks
+	@Autowired
+	private EventService eventService;
 	
 	@Autowired
 	@InjectMocks
@@ -55,6 +61,31 @@ public class EventServiceTest extends AbstractTransactionalJUnit4SpringContextTe
 	private static List<Event> events;
 	private static List<Event> futureEvents;
 	private static List<Event> pastEvents;
+	
+	@Test
+	public void testGetEventsByName() {		
+		Iterable<Event> allEvents = eventService.findAll();
+		assertThat(((Collection<Event>) allEvents).size(), is(4));
+		
+		// Case where the term is not complete (whole term match implementation)
+		Iterable<Event> eventList = eventService.findAllByName("Even");
+		assertThat(((Collection<Event>) eventList).size(), is(0));
+		
+		// Case where the term is complete, ignoring case (should return all)
+		eventList = eventService.findAllByName("EVENT");
+		assertThat(((Collection<Event>) eventList).size(), 
+		   equalTo(((Collection<Event>) allEvents).size()));
+		for(Event event : eventList) {
+			assertThat(allEvents, hasItem(event));
+		}
+		
+		// Case where looking for a specific event (should return 1).
+		eventList = eventService.findAllByName("Test Event 3");
+		assertThat(((Collection<Event>) eventList).size(), is(1));
+		for(Event event : eventList) {
+			assertThat(event.getName(), equalTo("Test Event 3"));
+		}
+	}
 	
 	@BeforeEach
 	//This will set up a fixed clock in order to test the functionality
