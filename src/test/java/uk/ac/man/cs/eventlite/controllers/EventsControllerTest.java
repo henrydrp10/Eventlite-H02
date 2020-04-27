@@ -295,4 +295,36 @@ public class EventsControllerTest {
 		verify(eventService).createTweet(tweet);
 	}
 	
+	@Test
+	public void postEmptyTweet() throws Exception {
+		
+		Venue v = new Venue();
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		
+		
+		Event e = new Event();
+		e.setId(1);
+		e.setName("Event");
+		e.setDate(LocalDate.now());
+		e.setTime(LocalTime.now());
+		e.setVenue(v);
+		long id = e.getId();
+		
+		String tweet = null;
+		
+		when(eventService.findOne(id)).thenReturn(e);
+
+		mvc.perform(MockMvcRequestBuilders.post("/events/tweet/"+id).with(user("Rob").roles(Security.ADMIN_ROLE))
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("tweet", tweet)
+				.accept(MediaType.TEXT_HTML).with(csrf()))
+		.andExpect(status().isFound())
+		.andExpect(view().name("redirect:/events/{id}")).andExpect(model().hasNoErrors())
+		.andExpect(handler().methodName("updateStatusOnTwitter"));
+
+		verify(eventService).createTweet(tweet);
+	}
+	
 }
