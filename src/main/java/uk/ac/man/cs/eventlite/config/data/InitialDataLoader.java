@@ -75,9 +75,9 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 		event1.setDate(LocalDate.parse("2020-02-13"));
 		event1.setTime(LocalTime.parse("12:00"));
 
-		event1.setDescription("A joana e linda");
+		event1.setDescription("Test description for Test Event 1");
 		event1.setVenue(venue1);
-		event1.setSummary("a nice summary for test event 1");
+		event1.setSummary("Test summary for Test Event 1");
 		eventService.save(event1);
 		
 		Event event2 = new Event();
@@ -85,29 +85,29 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
 		event2.setDate(LocalDate.parse("2020-02-14"));
 		event2.setTime(LocalTime.parse("08:00"));
 	
-		event2.setDescription("A joana e linda");
+		event2.setDescription("Test description for Test Event 2");
 		event2.setVenue(venue2);
-		event2.setSummary("a nice summary for test event 2");
+		event2.setSummary("Test summary for Test Event 2");
 		eventService.save(event2);
 		
 		Event event3 = new Event();
 		event3.setName("Test Event 3");
-		event3.setDate(LocalDate.parse("2020-02-13"));
+		event3.setDate(LocalDate.parse("2022-02-13"));
 		event3.setTime(LocalTime.parse("08:00"));
 
-		event3.setDescription("A joana e linda");
+		event3.setDescription("Test description for Test Event 3");
 		event3.setVenue(venue1);
-		event3.setSummary("a nice summary for test event 3");
+		event3.setSummary("Test summary for Test Event 3");
 		eventService.save(event3);
 		
 		Event event4 = new Event();
 		event4.setName("Test Event 4");
-		event4.setDate(LocalDate.parse("2020-02-14"));
+		event4.setDate(LocalDate.parse("2022-02-14"));
 		event4.setTime(LocalTime.parse("09:00"));
 
-		event4.setDescription("A joana e linda");
+		event4.setDescription("Test description for Test Event 4");
 		event4.setVenue(venue2);
-		event4.setSummary("a nice summary for test event 4");
+		event4.setSummary("Test summary for Test Event 4");
 		eventService.save(event4);
 	}
 }
