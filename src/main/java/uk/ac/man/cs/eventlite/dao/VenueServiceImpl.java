@@ -16,7 +16,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
-import uk.ac.man.cs.eventlite.entities.Event;
+
 @Service
 public class VenueServiceImpl implements VenueService {
 	
