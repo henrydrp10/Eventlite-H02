@@ -46,15 +46,12 @@
       </tbody>
     </table>
     
-
-    <a class="btn btn-primary" role="button" th:href="@{/venues}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
-     
-    <br><br>
-    <div class="form-group">
+    <p>
       <form th:action="@{/venues/delete/{num}(num=${id})}" th:method="delete">
-      <button type="submit" class="btn btn-primary"><i class="fas fa-trash" aria-hidden="true"></i> Delete venue</button>
-      </form>
-    </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-trash" aria-hidden="true"></i> Delete venue</button>
+    
+      <a class="btn btn-primary btn-back" role="button" th:href="@{/venues}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
+    </p>
      
   </div>
 

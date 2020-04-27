@@ -26,6 +26,10 @@ h3 {
 	margin-bottom: 15px;
 }
 
+.btn-back {
+	float: right;
+}
+
 .p-main-menu {
 	text-align: center;
 }
