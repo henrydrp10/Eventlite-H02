@@ -69,6 +69,9 @@ public class EventsControllerTest {
 
 	@Mock
 	private Event event;
+	
+	@Mock
+	private Iterable<Event> events;
 
 	@Mock
 	private Venue venue;
@@ -259,4 +262,17 @@ public class EventsControllerTest {
 	
 		verify(eventService, never()).deleteById(1);
 	}
+	
+	@Test
+	public void searchEventByName() throws Exception {
+		when(eventService.findAllByName("Event")).thenReturn(events);
+		mvc.perform(get("/events/byName?search=Event").accept(MediaType.TEXT_HTML))
+			.andExpect(status().isOk())
+			.andExpect(model().attribute("events", events))
+			.andExpect(view().name("events/byName"))
+			.andExpect(handler().methodName("getEventsByName"));
+		verify(eventService).findAllByName("Event");
+		verifyZeroInteractions(events);	
+	}
+	
 }

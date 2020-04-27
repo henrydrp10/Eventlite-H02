@@ -4,10 +4,12 @@ import static org.hamcrest.Matchers.endsWith;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -58,6 +60,9 @@ public class VenuesControllerTest {
 
 	@Mock
 	private Venue venue;
+	
+	@Mock
+	private Iterable<Venue> venues;
 
 	@Mock
 	private VenueService venueService;
@@ -206,5 +211,17 @@ public class VenuesControllerTest {
 		.andExpect(status().isForbidden());
 	
 		verify(venueService, never()).deleteById(1);
+	}
+	
+	@Test
+	public void searchVenueByName() throws Exception {
+		when(venueService.findAllByName("Venue")).thenReturn(venues);
+		mvc.perform(get("/venues/byName?search=Venue").accept(MediaType.TEXT_HTML))
+			.andExpect(status().isOk())
+			.andExpect(model().attribute("venues", venues))
+			.andExpect(view().name("venues/byName"))
+			.andExpect(handler().methodName("getVenuesByName"));
+		verify(venueService).findAllByName("Venue");
+		verifyZeroInteractions(venues);	
 	}
 }
