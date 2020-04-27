@@ -9,17 +9,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css" />
   <link rel="stylesheet" href="/webjars/font-awesome/css/all.min.css" />
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 
   <div class="container">
-    <div sec:authorize="!isAuthenticated()">
+    <div class="sign-in-bar" sec:authorize="!isAuthenticated()">
       <i class="fas fa-user-slash" aria-hidden="true"></i> Not signed in
       <a class="btn btn-primary" role="button" th:href="@{/sign-in}">
         <i class="fas fa-sign-in-alt" aria-hidden="true"></i> Sign in
       </a>
     </div>
-    <div sec:authorize="isAuthenticated()">
+    <div class="sign-in-bar" sec:authorize="isAuthenticated()">
       <form th:action="@{/sign-out}" method="post">
         <i class="fas fa-user" aria-hidden="true"></i> Signed in as <span sec:authentication="name"></span>
         <button type="submit" class="btn btn-warning"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sign out</button>

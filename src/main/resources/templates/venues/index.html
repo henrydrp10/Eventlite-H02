@@ -9,10 +9,12 @@
 	
   <div layout:fragment="content">
   
-	<form class="form-group" action="/venues/byName">
-		<input type="text" placeholder="Search for venue..." name="search">
-		<button type="submit"><i class="fa fa-search"></i></button>
-	</form>
+    <div class="search-container">
+	  <form class="form-group" type="text" action="/venues/byName">
+		<input class="search-bar" type="text" placeholder="Search for venue..." name="search">
+		<button class="search-bar-button" type="submit"><i class="fa fa-search"></i></button>
+	  </form>
+	</div>
 	
     <h1>All Venues</h1>
     <table class="table table-striped table-hover">

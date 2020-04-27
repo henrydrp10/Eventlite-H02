@@ -12,7 +12,7 @@
 <style>
   body { margin:0; padding:0; }
   #map-container { margin:0; margin-bottom:650px; padding:0; }
-  #map { position:absolute; width:1100px; height:600px }
+  #map { position:absolute; width:1110px; height:600px }
   
   .mapboxgl-popup { max-width: 200px; }
   .mapboxgl-popup-content { text-align: center; font-family: 'Open Sans', sans-serif; }
@@ -61,7 +61,7 @@
     
      <br>
        <form th:action="@{/events/tweet/{num}(num=${id})}" th:method="post">
-         <p><b> Share the event </b></p>
+         <h3>Share the event</h3>
          <input type="text" class="form-control" name="tweet" th:placeholder="${event.name}">
          <br>
          <button id="tweetBtn" type="submit" class="btn btn-primary" onclick="displaySuccessBox()"><i class="fab fa-twitter-square"></i> Send tweet</button>
