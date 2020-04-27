@@ -17,6 +17,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import java.util.ArrayList;
+
 import javax.servlet.Filter;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +41,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import uk.ac.man.cs.eventlite.EventLite;
+import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
+import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
 
 import org.mockito.ArgumentCaptor;
@@ -64,6 +68,9 @@ public class VenuesControllerTest {
 
 	@Mock
 	private VenueService venueService;
+	
+	@Mock
+	private EventService eventService;
 
 	@InjectMocks
 	private VenuesController venuesController;
@@ -162,27 +169,37 @@ public class VenuesControllerTest {
 		verify(venueService, never()).save(venue);
 	}
 	
-/*	
+	
 	@Test
 	public void getVenue() throws Exception {
+		
 		Venue v = new Venue();
-		v.setId(1);
-		v.setName("Venue");
+		v.setId(1000);
+		v.setName("Test Venue 1");
 		v.setCapacity(1000);
+		v.setRoadName("King St");
+		v.setPostCode("M2 1NL");
+		v.setLatitude(53.481380);
+		v.setLongitude(-2.246870);
 		venueService.save(v);
-		long id = 1;
-		
-		when(venueService.findOne(id)).thenReturn(venue);
-		System.out.println(venue.getName());
 
-		mvc.perform(MockMvcRequestBuilders.get("/venues/1").accept(MediaType.TEXT_HTML))
-		.andExpect(status().isOk())
-		.andExpect(view().name("venues/venue_details"))
-		.andExpect(handler().methodName("showVenueDetails"));
+		long id = 1000;
 		
-		verify(venueService).findOne(1);
+		when(venueService.findOne(id)).thenReturn(v);
+		when(eventService.findFuture()).thenReturn(new ArrayList<Event>());
+	
+
+		mvc.perform(MockMvcRequestBuilders.get("/venues/{id}", id).with(user("Rob").roles(Security.ADMIN_ROLE))
+		.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+		.accept(MediaType.TEXT_HTML)
+		.with(csrf()))
+		.andExpect(status().isOk())
+		.andExpect(handler().methodName("showVenueDetails"))
+		.andExpect(view().name("venues/venue_details"));
+		
+		verify(venueService).findOne(id);
 	}
-	*/
+	
 
 	@WithMockUser(username = "Mustafa", password = "Mustafa", roles= {"ADMINISTRATOR"})
 	public void deleteVenueByName() throws Exception {
