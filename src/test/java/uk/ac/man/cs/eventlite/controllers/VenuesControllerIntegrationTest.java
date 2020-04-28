@@ -51,6 +51,20 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 
 		httpEntity = new HttpEntity<String>(headers);
 	}
+	
+	@Test
+	public void testGetAllVenues() {
+		ResponseEntity<String> response = template.exchange("/venues", HttpMethod.GET, httpEntity, String.class);
+
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+	}
+	
+	@Test
+	public void testShowVenueDetailPage() {
+		ResponseEntity<String> response = template.exchange("/venues/1", HttpMethod.GET, httpEntity, String.class);
+
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
+	}
 
 	
 

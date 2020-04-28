@@ -2,6 +2,10 @@ package uk.ac.man.cs.eventlite.controllers;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -18,13 +22,17 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import uk.ac.man.cs.eventlite.EventLite;
+import uk.ac.man.cs.eventlite.config.Security;
 import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.entities.Event;
 
@@ -35,7 +43,9 @@ import uk.ac.man.cs.eventlite.entities.Event;
 public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4SpringContextTests {
 
 	private HttpEntity<String> httpEntity;
-
+	
+	private MockMvc mvc;
+	
 	@Autowired
 	private TestRestTemplate template;
 	
@@ -58,28 +68,10 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 	}
 	
 	@Test
-	public void testGetEventsByName() {
-		Iterable<Event> allEvents = eventService.findAll();
-		assertThat(((Collection<Event>) allEvents).size(), is(4));
-		
-		// Case where the term is not complete (whole term match implementation)
-		Iterable<Event> eventList = eventService.findAllByName("Even");
-		assertThat(((Collection<Event>) eventList).size(), is(0));
-		
-		// Case where the term is complete, ignoring case (should return all)
-		eventList = eventService.findAllByName("EVENT");
-		assertThat(((Collection<Event>) eventList).size(), 
-		   equalTo(((Collection<Event>) allEvents).size()));
-		for(Event event : eventList) {
-			assertThat(allEvents, hasItem(event));
-		}
-		
-		// Case where looking for a specific event (should return 1).
-		eventList = eventService.findAllByName("Test Event 3");
-		assertThat(((Collection<Event>) eventList).size(), is(1));
-		for(Event event : eventList) {
-			assertThat(event.getName(), equalTo("Test Event 3"));
-		}
+	public void testShowEventDetailPage() {
+		ResponseEntity<String> response = template.exchange("/events/1", HttpMethod.GET, httpEntity, String.class);
+
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
 	}
 
 }
