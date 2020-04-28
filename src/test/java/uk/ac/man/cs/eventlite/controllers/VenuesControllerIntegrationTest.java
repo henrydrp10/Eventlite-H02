@@ -53,30 +53,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 	}
 
 	
-	@Test
-	public void testGetVenuesByName() {
-		Iterable<Venue> allVenues = venueService.findAll();
-		assertThat(((Collection<Venue>) allVenues).size(), is(3));
-		
-		// Case where the term is not complete (whole term match implementation)
-		Iterable<Venue> venueList = venueService.findAllByName("Venu");
-		assertThat(((Collection<Venue>) venueList).size(), is(0));
-		
-		// Case where the term is complete, ignoring case (should return all)
-		venueList = venueService.findAllByName("VENUE");
-		assertThat(((Collection<Venue>) venueList).size(), 
-		   equalTo(((Collection<Venue>) allVenues).size()));
-		for(Venue venue : venueList) {
-			assertThat(allVenues, hasItem(venue));
-		}
-		
-		// Case where looking for a specific venue (should return 1).
-		venueList = venueService.findAllByName("Test Venue 3");
-		assertThat(((Collection<Venue>) venueList).size(), is(1));
-		for(Venue venue : venueList) {
-			assertThat(venue.getName(), equalTo("Test Venue 3"));
-		}
-	}
+
 
 }
 
