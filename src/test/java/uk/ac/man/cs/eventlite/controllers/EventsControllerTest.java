@@ -3,7 +3,7 @@ package uk.ac.man.cs.eventlite.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
-
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -140,6 +140,15 @@ public class EventsControllerTest {
 		verify(eventService).findOne(id);
 	}
 	
+	@Test
+	public void getEventWhenEventDoesNotExist() throws Exception {
+
+		mvc.perform(MockMvcRequestBuilders.get("/events/1000").accept(MediaType.TEXT_HTML)).andExpect(status().isFound())
+		.andExpect(view().name("redirect:/events")).andExpect(handler().methodName("showEventDetails"));
+		verify(eventService).findOne(1000);
+	}
+	
+	
 
 	public void getNewEventNoAuth() throws Exception {		
 		mvc.perform(MockMvcRequestBuilders.post("/events")
@@ -258,6 +267,102 @@ public class EventsControllerTest {
 		.andExpect(status().isForbidden());
 	
 		verify(eventService, never()).deleteById(1);
+	}
+	
+	@Test
+	public void putEvent() throws Exception {
+		
+	    Venue v = new Venue();
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		
+		ArgumentCaptor<Event> arg = ArgumentCaptor.forClass(Event.class);
+		
+		when(eventService.findOne(1)).thenReturn(event);
+
+		mvc.perform(MockMvcRequestBuilders.post("/events/update/1").with(user("Rob").roles(Security.ADMIN_ROLE))
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("name", "Test Event New")
+				.param("date", LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+				.param("venue", venue.getName())
+				.accept(MediaType.TEXT_HTML).with(csrf()))
+		.andExpect(status().isFound())
+		.andExpect(view().name("redirect:/events")).andExpect(model().hasNoErrors())
+		.andExpect(handler().methodName("putEvent"));
+
+		verify(eventService).save(arg.capture());
+	}
+	
+	
+	@Test
+	public void putEventWithNoName() throws Exception {
+
+		when(eventService.findOne(1)).thenReturn(event);
+		mvc.perform(MockMvcRequestBuilders.post("/events/update/1").with(user("Rob").roles(Security.ADMIN_ROLE))
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("name", "")
+				.param("date", LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+				.param("venue", venue.getName())
+				.accept(MediaType.TEXT_HTML).with(csrf()))
+		.andExpect(status().isOk())
+		.andExpect(view().name("events/updateEvent")).andExpect(model().hasNoErrors())
+		.andExpect(handler().methodName("putEvent"));
+
+		verify(eventService, never()).save(event);
+	}
+
+	/*
+	 * A suggestion for testing an invalid parameter
+	@Test
+	public void putEventWithOldDate() throws Exception {
+
+		when(eventService.findOne(1)).thenReturn(event);
+		mvc.perform(MockMvcRequestBuilders.post("/events/update/1").with(user("Rob").roles(Security.ADMIN_ROLE))
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("name", "Event")
+				.param("date", "2019-07-09")
+				.param("venue", venue.getName())
+				.accept(MediaType.TEXT_HTML).with(csrf()))
+		.andExpect(status().isOk())
+		.andExpect(view().name("events/updateEvent")).andExpect(model().hasNoErrors())
+		.andExpect(handler().methodName("putEvent"));
+
+		verify(eventService, never()).save(event);
+	}
+	*/
+	
+	@Test
+	@WithMockUser(username = "Mustafa", password = "Mustafa", roles= {"USER"})
+	public void putEventUnauthorisedUser() throws Exception {
+		when(eventService.findOne(1)).thenReturn(event);
+		
+		mvc.perform(MockMvcRequestBuilders.post("/events/update/{id}", 1)
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("name", "Test Event New")
+				.param("date", LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+				.param("venue", venue.getName())
+				.accept(MediaType.TEXT_HTML).with(csrf()))
+		.andExpect(status().isForbidden());
+	
+		verify(eventService, never()).save(event);
+	}
+	
+	@Test
+	@WithMockUser(username = "Mustafa", password = "Mustafa", roles= {"ADMINISTRATOR"})
+	public void putVenueNoCsrf() throws Exception {
+		when(eventService.findOne(1)).thenReturn(event);
+		
+		mvc.perform(MockMvcRequestBuilders.post("/events/update/{id}", 1)
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("name", "Test Event New")
+				.param("date", LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+				.param("venue", venue.getName())
+				.accept(MediaType.TEXT_HTML))
+		.andExpect(status().isForbidden());
+
+		
+		verify(eventService, never()).save(event);
 	}
 
 	
