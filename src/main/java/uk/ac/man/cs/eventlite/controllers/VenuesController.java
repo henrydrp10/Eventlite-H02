@@ -87,29 +87,26 @@ public class VenuesController {
 	public String showVenueDetails(@PathVariable("id") long id, Model model) {
 
 		Venue venue = venueService.findOne(id);
-		if(venue != null)
-		{
+		
+		if (venue != null) {
 			
 			List<Event> upcomingEventsInThisVenue = new ArrayList<Event>();
 			Iterable<Event> events = eventService.findFuture();
-			for(Event event : events)
-			{
-				if( event.getVenue() == venue)
-				{
+			
+			for(Event event : events) {
+				if( event.getVenue() == venue) {
 					upcomingEventsInThisVenue.add(event);
 				}
-				
 			}	
+			
 			model.addAttribute("venue", venue);
 			model.addAttribute("eventsf", upcomingEventsInThisVenue);
 			
 			
 
 			return "venues/venue_details";
-			
 		}
-		else
-		{
+		else {
 			return "redirect:/venues"; 
 		}
 		
@@ -142,24 +139,28 @@ public class VenuesController {
 	 
 	 	Venue venue = venueService.findOne(id);
 	 	
-	 	if(venue==null) {
+	 	if (venue == null) {
 	 		redirectAttrs.addFlashAttribute("error_message", "venue not found");
 	 	}
 	 	
 		model.addAttribute("venue", venue);
 		
-        return "venues/updateVenue";
+		redirectAttrs.addFlashAttribute("ok_message", "Venue updated.");	
+		return "redirect:/venues";
     }
 
 	@RequestMapping(value="/update/{id}", method= RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public String putVenue(@RequestBody @Valid @ModelAttribute Venue venue,  BindingResult errors, Model model, @PathVariable("id") long id, RedirectAttributes redirectAttrs) {
+	public String putVenue(@RequestBody @Valid @ModelAttribute Venue venue,
+			BindingResult errors, Model model, @PathVariable("id") long id, RedirectAttributes redirectAttrs) {
+		
 		Venue newVenue = venueService.findOne(id);	
-		// || venue.getName()=="" || venue.getCapacity()<=0 || venue.getRoadName()==""
+		
 		if (errors.hasErrors() ) {
-			model.addAttribute("venue", newVenue);
+			model.addAttribute("venue", venue);
 			
 			return "venues/updateVenue";
 		}
+		
 		newVenue.setName(venue.getName());
 		newVenue.setPostCode(venue.getPostCode());
 		newVenue.setRoadName(venue.getRoadName());
