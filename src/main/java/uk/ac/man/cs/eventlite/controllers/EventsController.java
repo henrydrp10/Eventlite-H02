@@ -57,17 +57,13 @@ public class EventsController {
 	public String showEventDetails(@PathVariable("id") long id, Model model) {
 
 		Event event = eventService.findOne(id);
-		if(event != null)
-		{
-			
+		if(event != null) {			
 			model.addAttribute("event", event);
 			model.addAttribute("lat", event.getVenue().getLatitude());
 			model.addAttribute("lon", event.getVenue().getLongitude());
 			return "events/event_details";
-			
 		}
-		else
-		{
+		else {
 			return "redirect:/events";
 		}
 		
@@ -88,8 +84,6 @@ public class EventsController {
 		
 		model.addAttribute("events", eventService.findAllByName(search));
 		return "events/byName";
-
-
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -128,7 +122,7 @@ public class EventsController {
 	 
 	 	Event event = eventService.findOne(id);
 	 	
-	 	if(event==null) {
+	 	if (event == null) {
 	 		redirectAttrs.addFlashAttribute("error_message", "event not found");
 	 	}
 	 	
@@ -142,14 +136,15 @@ public class EventsController {
     public Clock clock;
 
 	@RequestMapping(value="/update/{id}", method= RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	//public String putEvent(@PathVariable("id") Long id, Model model, Event event, BindingResult errors) {
-	public String putEvent(@RequestBody @Valid @ModelAttribute Event event,  BindingResult errors, Model model, @PathVariable("id") long id, RedirectAttributes redirectAttrs ) {
+	public String putEvent(@RequestBody @Valid @ModelAttribute Event event,
+			BindingResult errors, Model model, @PathVariable("id") long id, RedirectAttributes redirectAttrs ) {
+		
 		Event newEvent = eventService.findOne(id);	
-// || event.getName()=="" || eventService.isEventPast(event)  
-		if (errors.hasErrors() 	)
-		{
-			model.addAttribute("event", newEvent);
+
+		if (errors.hasErrors()) {
+			model.addAttribute("event", event);
 			model.addAttribute("venueList", venueService.findAll());
+			
 			return "events/updateEvent";
 		}
 
@@ -162,6 +157,7 @@ public class EventsController {
 		
 		eventService.save(newEvent);
 
+		redirectAttrs.addFlashAttribute("ok_message", "Event updated.");	
 		return "redirect:/events";
 	}
 	
