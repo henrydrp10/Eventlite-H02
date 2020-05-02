@@ -2,13 +2,18 @@ package uk.ac.man.cs.eventlite.controllers;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.client.TestRestTemplate.HttpClientOption;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -30,11 +36,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import uk.ac.man.cs.eventlite.EventLite;
 import uk.ac.man.cs.eventlite.config.Security;
 import uk.ac.man.cs.eventlite.dao.EventService;
+import uk.ac.man.cs.eventlite.dao.VenueService;
 import uk.ac.man.cs.eventlite.entities.Event;
+import uk.ac.man.cs.eventlite.entities.Venue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = EventLite.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -51,6 +61,15 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 	
 	@Autowired
 	private EventService eventService;
+	
+	@Autowired
+	private VenueService venueService;
+	
+	private String loginUrl = "http://localhost:8080/sign-in";
+	
+	// We need cookies for Web log in.
+	// Initialize this each time we need it to ensure it's clean.
+	private TestRestTemplate stateful;
 
 	@BeforeEach
 	public void setup() {
@@ -59,7 +78,7 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 
 		httpEntity = new HttpEntity<String>(headers);
 	}
-
+	
 	@Test
 	public void testGetAllEvents() {
 		ResponseEntity<String> response = template.exchange("/events", HttpMethod.GET, httpEntity, String.class);
@@ -73,5 +92,447 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
 	}
+	
+//	@Test
+//	public void testShowUpdateEventPage() {
+//		template = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+//		
+//		// Set up headers for GETting and POSTing.
+//		HttpHeaders getHeaders = new HttpHeaders();
+//		HttpHeaders postHeaders = new HttpHeaders();
+//		
+//		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+//		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+//		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//		
+//		//Login and get cookie session
+//		String cookie = integrationLogin(template, getHeaders, postHeaders);
+//		
+//		// Set the session cookie and GET the new greeting form so we can read
+//		// the new CSRF token.
+//		getHeaders.set("Cookie", cookie);
+//		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
 
+		
+//		ResponseEntity<String> response = template.exchange("http://localhost:8080/events/updateEvent/1", HttpMethod.GET, httpEntity, String.class);
+//		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+//	}
+	
+
+	
+	@Test
+	public void testShowCreateEventPage() {
+		
+		ResponseEntity<String> response = template.exchange("/events/new", HttpMethod.GET, httpEntity, String.class);
+
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+	}
+	
+	
+	
+	@Test
+	public void testCreateEvent() {
+		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(stateful, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new greeting form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> formResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(formResponse.getBody());
+
+		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
+		long id = venueService.findAll().iterator().next().getId();
+		event.add("_csrf", csrfToken);
+		event.add("name", "test name");
+		event.add("venue.id", id + "");
+		event.add("description", "test description");
+		event.add("summary", "test summary");
+		event.add("date", "2022-06-13");
+		event.add("time", "20:00");
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event, postHeaders);
+		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/events", HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));		
+	}
+	
+	@Test
+	public void testCreateEventNoCSRF() {
+		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(stateful, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new greeting form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> formResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(formResponse.getBody());
+
+		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
+		long id = venueService.findAll().iterator().next().getId();
+		event.add("name", "test name");
+		event.add("venue.id", id + "");
+		event.add("description", "test description");
+		event.add("summary", "test summary");
+		event.add("date", "2022-06-13");
+		event.add("time", "20:00");
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event, postHeaders);
+		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/events", HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));		
+	}
+	
+	@Test
+	public void testCreateEventNoLogin() {
+		HttpHeaders postHeaders = new HttpHeaders();
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
+		long id = venueService.findAll().iterator().next().getId();
+		event.add("name", "test name");
+		event.add("venue.id", id + "");
+		event.add("description", "test description");
+		event.add("summary", "test summary");
+		event.add("date", "2022-06-13");
+		event.add("time", "20:00");
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event,
+				postHeaders);
+
+		ResponseEntity<String> response = template.exchange("http://localhost:8080/events", HttpMethod.POST, postEntity, String.class);
+
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
+	}
+
+	
+	@Test
+	public void testUpdateEvent() {
+		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(stateful, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new event form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> loginResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(loginResponse.getBody());
+
+		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
+		long id = venueService.findAll().iterator().next().getId();
+		event.add("_csrf", csrfToken);
+		event.add("name", "update test name");
+		event.add("venue.id", id + "");
+		event.add("description", "update test description");
+		event.add("summary", "test description");
+		event.add("date", "2022-06-13");
+		event.add("time", "20:00");
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event, postHeaders);
+		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/events/update/1", HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
+
+		
+	}
+	
+	@Test
+	public void testUpdateEventNoCSRF() {
+		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(stateful, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new event form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> loginResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(loginResponse.getBody());
+
+		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
+		long id = venueService.findAll().iterator().next().getId();
+		//event.add("_csrf", csrfToken);
+		event.add("name", "update test name");
+		event.add("venue.id", id + "");
+		event.add("description", "update test description");
+		event.add("summary", "test description");
+		event.add("date", "2022-06-13");
+		event.add("time", "20:00");
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event, postHeaders);
+		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/events/update/1", HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
+
+		
+	}
+	
+	public void testUpdateEventNoLogin() {
+		HttpHeaders postHeaders = new HttpHeaders();
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
+		long id = venueService.findAll().iterator().next().getId();
+		event.add("name", "test name");
+		event.add("venue.id", id + "");
+		event.add("description", "test description");
+		event.add("summary", "test summary");
+		event.add("date", "2022-06-13");
+		event.add("time", "20:00");
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event,
+				postHeaders);
+
+		ResponseEntity<String> response = template.exchange("http://localhost:8080/events/update/1", HttpMethod.POST, postEntity, String.class);
+
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
+	}
+	
+	@Test
+	public void testDeleteEventNoLogin() {
+		
+		HttpHeaders getHeaders = new HttpHeaders();		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+
+		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
+		long id = venueService.findAll().iterator().next().getId();
+		event.add("name", "test name");
+		event.add("venue.id", id + "");
+		event.add("description", "test description");
+		event.add("summary", "test summary");
+		event.add("date", "2022-06-13");
+		event.add("time", "20:00");
+		HttpEntity<MultiValueMap<String, String>> deleteEntity = new HttpEntity<MultiValueMap<String, String>>(event, getHeaders);
+
+		ResponseEntity<String> response = template.exchange("http://localhost:8080/events/delete/1", HttpMethod.DELETE, deleteEntity, String.class);
+
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
+		
+	}
+	
+	@Test
+	public void testDeleteEvent() {
+		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(stateful, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new event form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> loginResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(loginResponse.getBody());
+
+		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
+		long id = venueService.findAll().iterator().next().getId();
+		event.add("_csrf", csrfToken);
+		event.add("name", "update test name");
+		event.add("venue.id", id + "");
+		event.add("description", "update test description");
+		event.add("summary", "test description");
+		event.add("date", "2022-06-13");
+		event.add("time", "20:00");
+		HttpEntity<MultiValueMap<String, String>> deleteEntity = new HttpEntity<MultiValueMap<String, String>>(event, getHeaders);
+		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/events/delete/1", HttpMethod.DELETE, deleteEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
+
+		
+	}
+	
+	@Test
+	public void testDeleteEventNoCSRF() {
+		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(stateful, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new event form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> loginResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(loginResponse.getBody());
+
+		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
+		long id = venueService.findAll().iterator().next().getId();
+		event.add("name", "update test name");
+		event.add("venue.id", id + "");
+		event.add("description", "update test description");
+		event.add("summary", "test description");
+		event.add("date", "2022-06-13");
+		event.add("time", "20:00");
+		HttpEntity<MultiValueMap<String, String>> deleteEntity = new HttpEntity<MultiValueMap<String, String>>(event, getHeaders);
+		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/events/delete/1", HttpMethod.DELETE, deleteEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
+
+		
+	}
+	
+	
+	@Test
+	public void testPostTweet() {
+		template = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(template, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new event form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> loginResponse = template.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(loginResponse.getBody());
+        
+		MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+		form.add("_csrf", csrfToken);
+		form.add("tweet", "test tweet");
+
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(form, postHeaders);
+		ResponseEntity<String> response = template.exchange("http://localhost:8080/events/update/1", HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
+
+		
+	}
+	
+	@Test
+	public void testPostTweetNoCSRF() {
+		template = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(template, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new event form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> loginResponse = template.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(loginResponse.getBody());
+        
+		MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+		form.add("tweet", "test tweet");
+
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(form, postHeaders);
+		ResponseEntity<String> response = template.exchange("http://localhost:8080/events/update/1", HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
+
+		
+	}
+	
+	@Test
+	public void testPostTweetNoLogin() {
+		HttpHeaders postHeaders = new HttpHeaders();
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+		form.add("tweet", "test tweet");
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(form,
+				postHeaders);
+
+		ResponseEntity<String> response = template.exchange("http://localhost:8080/events/update/1", HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
+	}
+	
+	
+	
+	
+	
+	
+	public static String getCsrfToken(String body)
+	{
+		Pattern pattern = Pattern.compile("(?s).*name=\"_csrf\".*?value=\"([^\"]+).*");
+		Matcher matcher = pattern.matcher(body);
+		assertThat(matcher.matches(), equalTo(true));
+		return matcher.group(1);
+	}
+	
+	public static String integrationLogin(TestRestTemplate t, HttpHeaders getHeaders, HttpHeaders postHeaders)
+	{
+		
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> formResponse = t.exchange("http://localhost:8080/sign-in", HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(formResponse.getBody());
+		String cookie = formResponse.getHeaders().getFirst("Set-Cookie").split(";")[0];
+		HttpEntity<MultiValueMap<String, String>> postEntity;
+		postHeaders.set("Cookie", cookie);
+		MultiValueMap<String, String> login = new LinkedMultiValueMap<>();
+		login.add("_csrf", csrfToken);
+		login.add("username", "Organiser");
+		login.add("password", "Organiser");
+		
+		// Log in.
+		postEntity = new HttpEntity<MultiValueMap<String, String>>(login,
+				postHeaders);
+		ResponseEntity<String> loginResponse = t.exchange("http://localhost:8080/sign-in", HttpMethod.POST, postEntity, String.class);
+		assertThat(loginResponse.getStatusCode(), equalTo(HttpStatus.FOUND));
+		
+		return cookie;
+	}
+	
 }
