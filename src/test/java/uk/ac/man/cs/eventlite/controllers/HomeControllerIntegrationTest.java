@@ -2,15 +2,6 @@ package uk.ac.man.cs.eventlite.controllers;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,29 +13,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.client.TestRestTemplate.HttpClientOption;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import uk.ac.man.cs.eventlite.EventLite;
-import uk.ac.man.cs.eventlite.config.Security;
-import uk.ac.man.cs.eventlite.dao.EventService;
-import uk.ac.man.cs.eventlite.dao.VenueService;
-import uk.ac.man.cs.eventlite.entities.Event;
-import uk.ac.man.cs.eventlite.entities.Venue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = EventLite.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -54,12 +38,14 @@ public class HomeControllerIntegrationTest extends AbstractTransactionalJUnit4Sp
 
 	private HttpEntity<String> httpEntity;
 	
-	
 	@Autowired
 	private TestRestTemplate template;
 	
-	
-	private String loginUrl = "http://localhost:8080/sign-in";
+	@LocalServerPort
+	private int port;
+
+	private String baseUrl;
+	private String loginUrl;
 	
 	// We need cookies for Web log in.
 	// Initialize this each time we need it to ensure it's clean.
@@ -67,6 +53,9 @@ public class HomeControllerIntegrationTest extends AbstractTransactionalJUnit4Sp
 
 	@BeforeEach
 	public void setup() {
+		this.baseUrl = "http://localhost:" + port;
+		this.loginUrl = "http://localhost:" + port + "/sign-in";
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 
@@ -75,7 +64,7 @@ public class HomeControllerIntegrationTest extends AbstractTransactionalJUnit4Sp
 	
 	@Test
 	public void getLoginForm() {
-		get("http://localhost:8080/sign-in", "_csrf");
+		get(loginUrl, "_csrf");
 	}
 	
 	@Test
@@ -102,7 +91,7 @@ public class HomeControllerIntegrationTest extends AbstractTransactionalJUnit4Sp
 				headers);
 		ResponseEntity<String> loginResponse = stateful.exchange(loginUrl, HttpMethod.POST, postEntity, String.class);
 		assertThat(loginResponse.getStatusCode(), equalTo(HttpStatus.FOUND));
-		assertThat(loginResponse.getHeaders().getLocation().toString(), endsWith(":8080/"));
+		assertThat(loginResponse.getHeaders().getLocation().toString(), endsWith("" + port + "/"));
 	}
 	
 	@Test
@@ -161,7 +150,7 @@ public class HomeControllerIntegrationTest extends AbstractTransactionalJUnit4Sp
 	
 	@Test
 	public void testShowHomepage() {
-		ResponseEntity<String> response = template.exchange("http://localhost:8080", HttpMethod.GET, httpEntity, String.class);
+		ResponseEntity<String> response = template.exchange(baseUrl, HttpMethod.GET, httpEntity, String.class);
 
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 	}
@@ -175,11 +164,11 @@ public class HomeControllerIntegrationTest extends AbstractTransactionalJUnit4Sp
 		return matcher.group(1);
 	}
 	
-	public static String integrationLogin(TestRestTemplate t, HttpHeaders getHeaders, HttpHeaders postHeaders)
+	public String integrationLogin(TestRestTemplate t, HttpHeaders getHeaders, HttpHeaders postHeaders)
 	{
 		
 		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
-		ResponseEntity<String> formResponse = t.exchange("http://localhost:8080/sign-in", HttpMethod.GET, getEntity, String.class);
+		ResponseEntity<String> formResponse = t.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
 		String csrfToken = getCsrfToken(formResponse.getBody());
 		String cookie = formResponse.getHeaders().getFirst("Set-Cookie").split(";")[0];
 		HttpEntity<MultiValueMap<String, String>> postEntity;
@@ -192,7 +181,7 @@ public class HomeControllerIntegrationTest extends AbstractTransactionalJUnit4Sp
 		// Log in.
 		postEntity = new HttpEntity<MultiValueMap<String, String>>(login,
 				postHeaders);
-		ResponseEntity<String> loginResponse = t.exchange("http://localhost:8080/sign-in", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> loginResponse = t.exchange(loginUrl, HttpMethod.POST, postEntity, String.class);
 		assertThat(loginResponse.getStatusCode(), equalTo(HttpStatus.FOUND));
 		
 		return cookie;

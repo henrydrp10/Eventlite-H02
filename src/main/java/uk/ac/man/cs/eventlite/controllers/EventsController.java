@@ -1,7 +1,6 @@
 package uk.ac.man.cs.eventlite.controllers;
 
 import java.time.Clock;
-import java.time.LocalDate;
 
 //import utils.EventsFormBuilder;
 
@@ -26,7 +25,6 @@ import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 
 import uk.ac.man.cs.eventlite.entities.Event;
-import uk.ac.man.cs.eventlite.entities.Venue;
 
 @Controller
 @RequestMapping(value = "/events", produces = { MediaType.TEXT_HTML_VALUE })

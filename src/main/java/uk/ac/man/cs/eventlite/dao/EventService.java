@@ -1,6 +1,5 @@
 package uk.ac.man.cs.eventlite.dao;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import twitter4j.Status;

@@ -3,7 +3,6 @@ package uk.ac.man.cs.eventlite.controllers;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,10 +30,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import uk.ac.man.cs.eventlite.EventLite;
-import uk.ac.man.cs.eventlite.dao.EventService;
-import uk.ac.man.cs.eventlite.dao.VenueService;
-import uk.ac.man.cs.eventlite.entities.Event;
-import uk.ac.man.cs.eventlite.entities.Venue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = EventLite.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -47,15 +42,10 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 	
 	private String baseUrl;
 
-
-
 	private HttpEntity<String> httpEntity;
 
 	@Autowired
 	private TestRestTemplate template;
-	
-	@Autowired
-	private VenueService venueService;
 	
     private String loginUrl ;
 	
@@ -179,9 +169,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		// Set the session cookie and GET the new greeting form so we can read
 		// the new CSRF token.
 		getHeaders.set("Cookie", cookie);
-		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
-		ResponseEntity<String> formResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
-		String csrfToken = getCsrfToken(formResponse.getBody());
+		
 		MultiValueMap<String, String> venue = new LinkedMultiValueMap<String, String>();
 		venue.add("name", "test name");
 		venue.add("roadName", "test description");
@@ -267,9 +255,6 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		// Set the session cookie and GET the new event form so we can read
 		// the new CSRF token.
 		getHeaders.set("Cookie", cookie);
-		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
-		ResponseEntity<String> loginResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
-		String csrfToken = getCsrfToken(loginResponse.getBody());
 
 		MultiValueMap<String, String> venue = new LinkedMultiValueMap<String, String>();
 		venue.add("name", "test name");
@@ -374,9 +359,6 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		// Set the session cookie and GET the new event form so we can read
 		// the new CSRF token.
 		getHeaders.set("Cookie", cookie);
-		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
-		ResponseEntity<String> loginResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
-		String csrfToken = getCsrfToken(loginResponse.getBody());
 
 		MultiValueMap<String, String> venue = new LinkedMultiValueMap<String, String>();
 		venue.add("name", "test name");
