@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.client.TestRestTemplate.HttpClientOption;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,6 +41,13 @@ import uk.ac.man.cs.eventlite.entities.Venue;
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4SpringContextTests {
+	
+	@LocalServerPort
+	private int port;
+	
+	private String baseUrl;
+
+
 
 	private HttpEntity<String> httpEntity;
 
@@ -49,7 +57,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 	@Autowired
 	private VenueService venueService;
 	
-    private String loginUrl = "http://localhost:8080/sign-in";
+    private String loginUrl ;
 	
 	// We need cookies for Web log in.
 	// Initialize this each time we need it to ensure it's clean.
@@ -58,6 +66,10 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 	@BeforeEach
 	public void setup() {
 		HttpHeaders headers = new HttpHeaders();
+		
+		this.baseUrl = "http://localhost:" + port + "/venues";
+		this.loginUrl = "http://localhost:" + port + "/sign-in";
+
 		headers.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
 
 		httpEntity = new HttpEntity<String>(headers);
@@ -72,7 +84,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 	
 	@Test
 	public void testShowVenueDetailPage() {
-		ResponseEntity<String> response = template.exchange("/venues/1", HttpMethod.GET, httpEntity, String.class);
+		ResponseEntity<String> response = template.exchange(baseUrl+ "/1", HttpMethod.GET, httpEntity, String.class);
 
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 	}
@@ -98,7 +110,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 //		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
 
 		
-		ResponseEntity<String> response = template.exchange("http://localhost:8080/venues/updateVenue/1", HttpMethod.GET, httpEntity, String.class);
+		ResponseEntity<String> response = template.exchange(baseUrl + "/updateVenue/1", HttpMethod.GET, httpEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 	}
 	
@@ -144,7 +156,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("postCode", "M144BX");
 		venue.add("capacity", "2000");
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
-		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/venues", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = stateful.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));		
 	}
 
@@ -176,7 +188,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("postCode", "test summary");
 		venue.add("capacity", "2000");
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
-		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/venues", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = stateful.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));		
 	}
 	
@@ -195,7 +207,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue,
 				postHeaders);
 
-		ResponseEntity<String> response = template.exchange("http://localhost:8080/venues/update/1", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = template.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
 
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
 
@@ -231,7 +243,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("postCode", "test summary");
 		venue.add("capacity", "2000");
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
-		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/venues/update/1", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
 
 		
@@ -265,7 +277,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("postCode", "test summary");
 		venue.add("capacity", "2000");
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
-		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/venues/update/1", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
 
 		
@@ -284,7 +296,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue,
 				postHeaders);
 
-		ResponseEntity<String> response = template.exchange("http://localhost:8080/venues/update/1", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = template.exchange( baseUrl +"/update/1", HttpMethod.POST, postEntity, String.class);
 
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
 	}
@@ -302,7 +314,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("capacity", "2000");
 		HttpEntity<MultiValueMap<String, String>> deleteEntity = new HttpEntity<MultiValueMap<String, String>>(venue, getHeaders);
 
-		ResponseEntity<String> response = template.exchange("http://localhost:8080/venues/delete/1", HttpMethod.DELETE, deleteEntity, String.class);
+		ResponseEntity<String> response = template.exchange(baseUrl + "/delete/1", HttpMethod.DELETE, deleteEntity, String.class);
 
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
 		
@@ -338,7 +350,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("postCode", "test summary");
 		venue.add("capacity", "2000");
 		HttpEntity<MultiValueMap<String, String>> deleteEntity = new HttpEntity<MultiValueMap<String, String>>(venue, getHeaders);
-		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/venues/delete/1", HttpMethod.DELETE, deleteEntity, String.class);
+		ResponseEntity<String> response = stateful.exchange(baseUrl +"/delete/1", HttpMethod.DELETE, deleteEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
 
 		
@@ -372,7 +384,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("postCode", "test summary");
 		venue.add("capacity", "2000");
 		HttpEntity<MultiValueMap<String, String>> deleteEntity = new HttpEntity<MultiValueMap<String, String>>(venue, getHeaders);
-		ResponseEntity<String> response = stateful.exchange("http://localhost:8080/venues/delete/1", HttpMethod.DELETE, deleteEntity, String.class);
+		ResponseEntity<String> response = stateful.exchange(baseUrl + "/delete/1", HttpMethod.DELETE, deleteEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
 
 		
@@ -387,11 +399,11 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		return matcher.group(1);
 	}
 	
-	public static String integrationLogin(TestRestTemplate t, HttpHeaders getHeaders, HttpHeaders postHeaders)
+	public  String integrationLogin(TestRestTemplate t, HttpHeaders getHeaders, HttpHeaders postHeaders)
 	{
 		
 		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
-		ResponseEntity<String> formResponse = t.exchange("http://localhost:8080/sign-in", HttpMethod.GET, getEntity, String.class);
+		ResponseEntity<String> formResponse = t.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
 		String csrfToken = getCsrfToken(formResponse.getBody());
 		String cookie = formResponse.getHeaders().getFirst("Set-Cookie").split(";")[0];
 		HttpEntity<MultiValueMap<String, String>> postEntity;
@@ -404,7 +416,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		// Log in.
 		postEntity = new HttpEntity<MultiValueMap<String, String>>(login,
 				postHeaders);
-		ResponseEntity<String> loginResponse = t.exchange("http://localhost:8080/sign-in", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> loginResponse = t.exchange(loginUrl, HttpMethod.POST, postEntity, String.class);
 		assertThat(loginResponse.getStatusCode(), equalTo(HttpStatus.FOUND));
 		
 		return cookie;
