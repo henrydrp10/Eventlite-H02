@@ -152,9 +152,10 @@ public class VenuesController {
     }
 
 	@RequestMapping(value="/update/{id}", method= RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public String putVenue(@PathVariable("id") Long id, Model model, Venue venue, BindingResult errors) {
+	public String putVenue(@RequestBody @Valid @ModelAttribute Venue venue,  BindingResult errors, Model model, @PathVariable("id") long id, RedirectAttributes redirectAttrs) {
 		Venue newVenue = venueService.findOne(id);	
-		if (errors.hasErrors() || venue.getName()=="" || venue.getCapacity()<=0 || venue.getRoadName()=="" ) {
+		// || venue.getName()=="" || venue.getCapacity()<=0 || venue.getRoadName()==""
+		if (errors.hasErrors() ) {
 			model.addAttribute("venue", newVenue);
 			
 			return "venues/updateVenue";
