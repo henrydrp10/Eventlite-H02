@@ -87,22 +87,32 @@ public class VenuesController {
 	public String showVenueDetails(@PathVariable("id") long id, Model model) {
 
 		Venue venue = venueService.findOne(id);
-		List<Event> upcomingEventsInThisVenue = new ArrayList<Event>();
-		Iterable<Event> events = eventService.findFuture();
-		for(Event event : events)
+		if(venue != null)
 		{
-			if( event.getVenue() == venue)
-			{
-				upcomingEventsInThisVenue.add(event);
-			}
 			
-		}	
-		model.addAttribute("venue", venue);
-		model.addAttribute("eventsf", upcomingEventsInThisVenue);
-		
-		
+			List<Event> upcomingEventsInThisVenue = new ArrayList<Event>();
+			Iterable<Event> events = eventService.findFuture();
+			for(Event event : events)
+			{
+				if( event.getVenue() == venue)
+				{
+					upcomingEventsInThisVenue.add(event);
+				}
+				
+			}	
+			model.addAttribute("venue", venue);
+			model.addAttribute("eventsf", upcomingEventsInThisVenue);
+			
+			
 
-		return "venues/venue_details";
+			return "venues/venue_details";
+			
+		}
+		else
+		{
+			return "redirect:/venues"; 
+		}
+		
 	}
 	
 
@@ -142,9 +152,14 @@ public class VenuesController {
     }
 
 	@RequestMapping(value="/update/{id}", method= RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public String putEvent(@PathVariable("id") Long id, Venue venue) {
-		 
-		Venue newVenue = venueService.findOne(id);
+	public String putVenue(@RequestBody @Valid @ModelAttribute Venue venue,  BindingResult errors, Model model, @PathVariable("id") long id, RedirectAttributes redirectAttrs) {
+		Venue newVenue = venueService.findOne(id);	
+		// || venue.getName()=="" || venue.getCapacity()<=0 || venue.getRoadName()==""
+		if (errors.hasErrors() ) {
+			model.addAttribute("venue", newVenue);
+			
+			return "venues/updateVenue";
+		}
 		newVenue.setName(venue.getName());
 		newVenue.setPostCode(venue.getPostCode());
 		newVenue.setRoadName(venue.getRoadName());

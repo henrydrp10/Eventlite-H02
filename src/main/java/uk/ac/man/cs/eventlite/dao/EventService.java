@@ -32,4 +32,6 @@ public interface EventService {
 	public String createTweet(String tweet) throws TwitterException;
 
 	public List<Status> getLastFiveStatusesFromTimeline() throws TwitterException;
+
+	public boolean isEventPast(Event event);
 }

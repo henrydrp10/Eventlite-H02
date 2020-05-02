@@ -35,7 +35,7 @@ public class HomeControllerApi {
 		Link venueLink = linkTo(VenuesControllerApi.class).withRel("venues");
 		Link eventLink = linkTo(EventsControllerApi.class).withRel("events");
 		//update this if the profileController will be made in the future.
-		Link profileLink = new Link("http://localhost:8080/api/profile").withRel("profile");
+		Link profileLink = linkTo(ProfileControllerApi.class).withRel("profile");
 		
 		//put the links relative to the controller in the future.
 		Link threeUpcomingEventsLink = new Link("http://localhost:8080/api/getThreeUpcomingEvents").withRel("Three Upcoming Events");

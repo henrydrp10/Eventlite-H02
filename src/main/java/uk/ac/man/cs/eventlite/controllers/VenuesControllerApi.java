@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import uk.ac.man.cs.eventlite.config.Hateoas;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
@@ -138,7 +137,7 @@ public class VenuesControllerApi {
 
 	private Resources<Resource<Venue>> venueToResource(Iterable<Venue> venues) {
 		Link selfLink = linkTo(methodOn(VenuesControllerApi.class).getAllVenues()).withSelfRel();
-		Link profileLink = linkTo(Hateoas.class).slash("api").slash("profile").slash("venues").withRel("profile");
+		Link profileLink = linkTo(ProfileControllerApi.class).slash("venues").withRel("profile");
 
 		List<Resource<Venue>> resources = new ArrayList<Resource<Venue>>();
 		for (Venue venue : venues) {

@@ -30,11 +30,12 @@ public class Event {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@Future(message = "Date must be in the future")
 	private LocalDate date;
-
+    	
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	@DateTimeFormat(pattern = "HH:mm")
 	private LocalTime time;
-
+    
+	@NotNull(message = "Name required")
 	@NotEmpty(message = "Name required")
 	@Size(max = 256, message = "The event name must have 256 characters or less")
 	private String name;

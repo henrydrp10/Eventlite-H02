@@ -1,5 +1,9 @@
 package uk.ac.man.cs.eventlite.controllers;
 
+import java.time.Clock;
+
+//import utils.EventsFormBuilder;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +30,6 @@ import uk.ac.man.cs.eventlite.entities.Event;
 @RequestMapping(value = "/events", produces = { MediaType.TEXT_HTML_VALUE })
 
 public class EventsController {
-	
-
 
 	@Autowired
 	private EventService eventService;
@@ -55,12 +57,21 @@ public class EventsController {
 	public String showEventDetails(@PathVariable("id") long id, Model model) {
 
 		Event event = eventService.findOne(id);
+		if(event != null)
+		{
+			
+			model.addAttribute("event", event);
+			model.addAttribute("lat", event.getVenue().getLatitude());
+			model.addAttribute("lon", event.getVenue().getLongitude());
+			return "events/event_details";
+			
+		}
+		else
+		{
+			return "redirect:/events";
+		}
 		
-		model.addAttribute("event", event);
-		model.addAttribute("lat", event.getVenue().getLatitude());
-		model.addAttribute("lon", event.getVenue().getLongitude());
 		
-		return "events/event_details";
 	}
 	
 	
@@ -126,11 +137,22 @@ public class EventsController {
 		
         return "events/updateEvent";
     }
+	
+	@Autowired
+    public Clock clock;
 
 	@RequestMapping(value="/update/{id}", method= RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public String putEvent(@PathVariable("id") Long id, Event event) {
-		 
-		Event newEvent = eventService.findOne(id);
+	//public String putEvent(@PathVariable("id") Long id, Model model, Event event, BindingResult errors) {
+	public String putEvent(@RequestBody @Valid @ModelAttribute Event event,  BindingResult errors, Model model, @PathVariable("id") long id, RedirectAttributes redirectAttrs ) {
+		Event newEvent = eventService.findOne(id);	
+// || event.getName()=="" || eventService.isEventPast(event)  
+		if (errors.hasErrors() 	)
+		{
+			model.addAttribute("event", newEvent);
+			model.addAttribute("venueList", venueService.findAll());
+			return "events/updateEvent";
+		}
+
 		newEvent.setName(event.getName());
 		newEvent.setDate(event.getDate());
 		newEvent.setTime(event.getTime());
