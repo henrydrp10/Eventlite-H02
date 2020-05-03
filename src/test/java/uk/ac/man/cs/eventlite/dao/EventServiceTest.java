@@ -71,7 +71,7 @@ public class EventServiceTest extends AbstractTransactionalJUnit4SpringContextTe
 	@Test
 	public void testGetEventsByName() {		
 		Iterable<Event> allEvents = eventService.findAll();
-		assertThat(((Collection<Event>) allEvents).size(), is(4));
+		assertThat(((Collection<Event>) allEvents).size(), is(6));
 		
 		// Case where the term is not complete (whole term match implementation)
 		Iterable<Event> eventList = eventService.findAllByName("Even");
@@ -126,7 +126,7 @@ public class EventServiceTest extends AbstractTransactionalJUnit4SpringContextTe
 		}
 	}
 	
-	/*
+	
 	//testing for three upcoming events method
 	@Test
 	public void testFourUpcomingEventsButThreeEarliestAreReturned()
@@ -134,6 +134,8 @@ public class EventServiceTest extends AbstractTransactionalJUnit4SpringContextTe
 	    Venue v = new Venue();
 		v.setName("Venue");
 		v.setCapacity(1000);
+		v.setRoadName("Ossory St");
+		v.setPostCode("M144BX");
 		venueServiceImpl.save(v);
 		
 		Event e1 = new Event();
@@ -187,7 +189,7 @@ public class EventServiceTest extends AbstractTransactionalJUnit4SpringContextTe
 		}
 				
 	}
-	*/
+	
 	
 	@Test
 	public void testLessThanThreeUpcomingEvents()
