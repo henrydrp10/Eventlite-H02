@@ -56,8 +56,6 @@ public class VenueServiceTest extends AbstractTransactionalJUnit4SpringContextTe
 	@Mock
 	private Clock clock;
 
-	// This class is here as a starter for testing any custom methods within the
-	// VenueService. Note: It is currently @Ignored!
 	
 	@BeforeEach
 	public void setup() {
@@ -249,23 +247,6 @@ public class VenueServiceTest extends AbstractTransactionalJUnit4SpringContextTe
 				
 	}
 	
-	
-	
-	
-	// updateLatLon
-	
-	   //The case where venue given is null
-	/*
-	 * This is a test for no results
-	@Test
-	public void updateLatLonInNullVenue()
-	{
-		Venue v = venueServiceImpl.updateLatLonIn(null);
-		assertTrue(v.getLatitude() == 1000 );
-		assertTrue(v.getLongitude() == 1000 );
-	}
-	*/ 
-	   // the case when an actual venue is given and the status should be okay
 	@Test
 	public void updateLatLonInNormalVenue()
 	{
