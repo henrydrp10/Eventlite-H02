@@ -41,7 +41,7 @@
           <th><i class="fas fa-calendar"></i> Date</th>
           <th><i class="fas fa-clock"></i> Time</th>
           <th><i class="fas fa-list-alt"></i> Summary</th>
-          <th><i class="fas fa-edit"></i> Update</th>
+          <th  th:if="${isAdmin}"  ><i class="fas fa-edit"></i> Update</th>
         </tr>
       </thead>
       <tbody>
@@ -53,7 +53,7 @@
           <td th:text="${{e.date}}">Event date</td>
           <td th:text="${{e.time}}">Event time</td>
           <td th:text="${{e.summary}}">Event Summary</td>
-          <td><a th:href="@{/events/updateEvent/{id}(id=${e.id})}"><i class="fas fa-pencil-alt"></i></a></td>
+          <td  th:if="${isAdmin}"  ><a th:href="@{/events/updateEvent/{id}(id=${e.id})}"><i class="fas fa-pencil-alt"></i></a></td>
         </tr>
       </tbody>
     </table>
@@ -66,7 +66,7 @@
           <th><i class="fas fa-map-marker-alt"></i> Road Name</th>
           <th><i class="fas fa-map-marker-alt"></i> Post Code</th>
           <th><i class="fas fa-archive"></i> Capacity</th>
-          <th><i class="fas fa-edit"></i> Update</th>
+          <th  th:if="${isAdmin}"  ><i class="fas fa-edit"></i> Update</th>
         </tr>
       </thead>
       <tbody>
@@ -77,7 +77,7 @@
           <td th:text="${{v.roadName}}">Venue roadName</td>
           <td th:text="${{v.postCode}}">Venue postCode</td>
           <td th:text="${{v.capacity}}">Venue capacity</td>
-          <td><a th:href="@{/venues/updateVenue/{id}(id=${v.id})}"><i class="fas fa-pencil-alt"></i></a></td>
+          <td  th:if="${isAdmin}"  ><a th:href="@{/venues/updateVenue/{id}(id=${v.id})}"><i class="fas fa-pencil-alt"></i></a></td>
         </tr>
       </tbody>
     </table>

@@ -1,6 +1,8 @@
 package uk.ac.man.cs.eventlite.controllers;
 
 import java.time.Clock;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 //import utils.EventsFormBuilder;
 
@@ -8,6 +10,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import twitter4j.TwitterException;
+import uk.ac.man.cs.eventlite.config.Security;
 import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 
@@ -38,10 +43,23 @@ public class EventsController {
 	private VenueService venueService;
 	
 	String MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiZXZlbnRsaXRlaDAyIiwiYSI6ImNrOG44NjNrNTBrZGMzbW9jbGRqc3kxbXQifQ.H2MJkZCOBTT-X9_noMmreA";
+	
+	private boolean hasRole(String role)
+	{
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		Set<String> roles = authentication.getAuthorities().stream()
+		     .map(r -> r.getAuthority()).collect(Collectors.toSet());
+		
+		return roles.contains("ROLE_"+role);
+		
+	}
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAllEvents(Model model) throws TwitterException {
+		
 
+		model.addAttribute("isAdmin", hasRole(Security.ADMIN_ROLE));
 		model.addAttribute("events", eventService.findAll());
 		model.addAttribute("venues", venueService.findAll());
 		
@@ -57,7 +75,8 @@ public class EventsController {
 	public String showEventDetails(@PathVariable("id") long id, Model model) {
 
 		Event event = eventService.findOne(id);
-		if(event != null) {			
+		if(event != null) {		
+			model.addAttribute("isAdmin", hasRole(Security.ADMIN_ROLE));
 			model.addAttribute("event", event);
 			model.addAttribute("lat", event.getVenue().getLatitude());
 			model.addAttribute("lon", event.getVenue().getLongitude());
@@ -81,7 +100,7 @@ public class EventsController {
 
 	@RequestMapping(value = "/byName", method = RequestMethod.GET)
 	public String getEventsByName(Model model, @RequestParam String search) {
-		
+		model.addAttribute("isAdmin", hasRole(Security.ADMIN_ROLE));
 		model.addAttribute("events", eventService.findAllByName(search));
 		return "events/byName";
 	}

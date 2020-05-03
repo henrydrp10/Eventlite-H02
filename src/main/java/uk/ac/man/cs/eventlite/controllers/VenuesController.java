@@ -2,11 +2,15 @@ package uk.ac.man.cs.eventlite.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import uk.ac.man.cs.eventlite.config.Security;
 import uk.ac.man.cs.eventlite.dao.EventRepository;
 import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
@@ -39,11 +44,22 @@ public class VenuesController {
 	@Autowired
 	private EventService eventService;
 	
+	private boolean hasRole(String role)
+	{
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		Set<String> roles = authentication.getAuthorities().stream()
+		     .map(r -> r.getAuthority()).collect(Collectors.toSet());
+		
+		return roles.contains("ROLE_"+role);
+		
+	}
+	
 	String MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiZXZlbnRsaXRlaDAyIiwiYSI6ImNrOG44NjNrNTBrZGMzbW9jbGRqc3kxbXQifQ.H2MJkZCOBTT-X9_noMmreA";
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAllVenues(Model model) {
-		
+		model.addAttribute("isAdmin", hasRole(Security.ADMIN_ROLE));
 		model.addAttribute("venuelist", venueService.findAll());
 		
 		return "venues/index";
@@ -51,7 +67,7 @@ public class VenuesController {
 	
 	@RequestMapping(value = "/byName", method = RequestMethod.GET)
 	public String getVenuesByName(Model model, @RequestParam String search) {
-		
+		model.addAttribute("isAdmin", hasRole(Security.ADMIN_ROLE));
 		model.addAttribute("venues", venueService.findAllByName(search));
 		return "venues/byName";
 	}
@@ -98,7 +114,7 @@ public class VenuesController {
 					upcomingEventsInThisVenue.add(event);
 				}
 			}	
-			
+			model.addAttribute("isAdmin", hasRole(Security.ADMIN_ROLE));
 			model.addAttribute("venue", venue);
 			model.addAttribute("eventsf", upcomingEventsInThisVenue);
 			

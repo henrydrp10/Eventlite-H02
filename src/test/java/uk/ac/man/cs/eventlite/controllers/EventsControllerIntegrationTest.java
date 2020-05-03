@@ -476,10 +476,6 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 	}
 	
 	
-	
-	
-	
-	
 	public static String getCsrfToken(String body)
 	{
 		Pattern pattern = Pattern.compile("(?s).*name=\"_csrf\".*?value=\"([^\"]+).*");
