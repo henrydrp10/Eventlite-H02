@@ -80,8 +80,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 	}
 	
 	@Test
-	public void testShowUpdateEventPage() {
-		
+	public void testShowUpdateEventPage() {		
 		ResponseEntity<String> response = template.exchange(baseUrl + "/updateVenue/1", HttpMethod.GET, httpEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 	}
@@ -96,10 +95,8 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 	}
 	
-	
-	
 	@Test
-	public void testCreateVenue() {
+	public void testCreateVenueSensibleData() {
 		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
 		
 		// Set up headers for GETting and POSTing.
@@ -131,6 +128,72 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		ResponseEntity<String> response = stateful.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));		
 	}
+	
+	@Test
+	public void testCreateVenueBadData() {
+		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(stateful, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new greeting form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> formResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(formResponse.getBody());
+
+		MultiValueMap<String, String> venue = new LinkedMultiValueMap<String, String>();
+
+		venue.add("_csrf", csrfToken);
+		venue.add("name", "");
+		venue.add("roadName", "Ossory St");
+		venue.add("postCode", "M144BX");
+		venue.add("capacity", "2000");
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
+		ResponseEntity<String> response = stateful.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));		
+	}
+	
+	@Test
+	public void testCreateVenueNoData() {
+		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(stateful, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new greeting form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> formResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(formResponse.getBody());
+
+		MultiValueMap<String, String> venue = new LinkedMultiValueMap<String, String>();
+
+		venue.add("_csrf", csrfToken);
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
+		ResponseEntity<String> response = stateful.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));		
+	}
+
+
 
 	
 	@Test
@@ -185,7 +248,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 
 	
 	@Test
-	public void testUpdateVenue() {
+	public void testUpdateVenueSensibleData() {
 		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
 		
 		// Set up headers for GETting and POSTing.
@@ -212,6 +275,70 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("roadName", "test description");
 		venue.add("postCode", "test summary");
 		venue.add("capacity", "2000");
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
+		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
+	}
+	
+	@Test
+	public void testUpdateVenueBadData() {
+		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(stateful, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new event form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> loginResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(loginResponse.getBody());
+
+		MultiValueMap<String, String> venue = new LinkedMultiValueMap<String, String>();
+		venue.add("_csrf", csrfToken);
+		venue.add("name", "");
+		venue.add("roadName", "test description");
+		venue.add("postCode", "test summary");
+		venue.add("capacity", "2000");
+		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
+		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
+
+		
+	}
+	
+	@Test
+	public void testUpdateVenueNoData() {
+		stateful = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
+		
+		// Set up headers for GETting and POSTing.
+		HttpHeaders getHeaders = new HttpHeaders();
+		HttpHeaders postHeaders = new HttpHeaders();
+		
+		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
+		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		//Login and get cookie session
+		String cookie = integrationLogin(stateful, getHeaders, postHeaders);
+		
+		// Set the session cookie and GET the new event form so we can read
+		// the new CSRF token.
+		getHeaders.set("Cookie", cookie);
+		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
+		ResponseEntity<String> loginResponse = stateful.exchange(loginUrl, HttpMethod.GET, getEntity, String.class);
+		String csrfToken = getCsrfToken(loginResponse.getBody());
+
+		MultiValueMap<String, String> venue = new LinkedMultiValueMap<String, String>();
+		venue.add("_csrf", csrfToken);
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
 		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
