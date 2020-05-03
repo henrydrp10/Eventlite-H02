@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -30,6 +31,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import uk.ac.man.cs.eventlite.EventLite;
+import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 
 @ExtendWith(SpringExtension.class)
@@ -46,6 +48,9 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 	@Autowired
 	private VenueService venueService;
 	
+	@Autowired
+	private EventService eventService;
+	
 	@LocalServerPort
 	private int port;
 
@@ -58,7 +63,7 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 
 	@BeforeEach
 	public void setup() {
-		this.baseUrl = "http://localhost:" + port;
+		this.baseUrl = "http://localhost:" + port + "/events";
 		this.loginUrl = "http://localhost:" + port + "/sign-in";
 		
 		HttpHeaders headers = new HttpHeaders();
@@ -90,8 +95,8 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 	
 	@Test
 	public void testShowUpdateEventPage() {
-
-		ResponseEntity<String> response = template.exchange(baseUrl+ "/events/updateEvent/5", HttpMethod.GET, httpEntity, String.class);
+		//long id = eventService.findAll().iterator().next().getId();
+		ResponseEntity<String> response = template.exchange(baseUrl+ "/updateEvent/5", HttpMethod.GET, httpEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 	}
 	
@@ -139,7 +144,7 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 		event.add("date", "2022-06-13");
 		event.add("time", "20:00");
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event, postHeaders);
-		ResponseEntity<String> response = stateful.exchange(baseUrl + "/events", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = stateful.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));	
 	}
 	 
@@ -176,8 +181,8 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 		event.add("date", "2022-06-13");
 		event.add("time", "20:00");
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event, postHeaders);
-		ResponseEntity<String> response = stateful.exchange(baseUrl + "/events", HttpMethod.POST, postEntity, String.class);
-		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));		
+		ResponseEntity<String> response = stateful.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));		
 	}
 	
 	//No Data
@@ -206,8 +211,8 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
 		event.add("_csrf", csrfToken);
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event, postHeaders);
-		ResponseEntity<String> response = stateful.exchange(baseUrl + "/events", HttpMethod.POST, postEntity, String.class);
-		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
+		ResponseEntity<String> response = stateful.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 	}
 	
 	
@@ -239,7 +244,7 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 		event.add("date", "2022-06-13");
 		event.add("time", "20:00");
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event, postHeaders);
-		ResponseEntity<String> response = stateful.exchange(baseUrl + "/events", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = stateful.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));		
 	}
 	
@@ -260,7 +265,7 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event,
 				postHeaders);
 
-		ResponseEntity<String> response = template.exchange(baseUrl + "/events", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = template.exchange(baseUrl , HttpMethod.POST, postEntity, String.class);
 
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
 	}
@@ -290,15 +295,17 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 
 		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
 		long id = venueService.findAll().iterator().next().getId();
+		long idE = eventService.findAll().iterator().next().getId();
 		event.add("_csrf", csrfToken);
 		event.add("name", "update test name");
+		event.add("id", idE+"");
 		event.add("venue.id", id + "");
 		event.add("description", "update test description");
 		event.add("summary", "test description");
 		event.add("date", "2022-06-13");
 		event.add("time", "20:00");
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event, postHeaders);
-		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = stateful.exchange(baseUrl+ "/update/" + idE, HttpMethod.POST, postEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
 
 		
@@ -328,16 +335,18 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 
 		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
 		long id = venueService.findAll().iterator().next().getId();
+		long idE = eventService.findAll().iterator().next().getId();
 		event.add("_csrf", csrfToken);
 		event.add("name", "");
 		event.add("venue.id", id + "");
+		event.add("id", idE+"");
 		event.add("description", "update test description");
 		event.add("summary", "test description");
 		event.add("date", "2022-06-13");
 		event.add("time", "20:00");
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event, postHeaders);
-		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
-		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
+		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/" + idE, HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 
 		
 	}
@@ -365,11 +374,11 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 		String csrfToken = getCsrfToken(loginResponse.getBody());
 
 		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
-		long id = venueService.findAll().iterator().next().getId();
+		long idE = eventService.findAll().iterator().next().getId();
 		event.add("_csrf", csrfToken);
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(event, postHeaders);
-		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
-		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
+		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/" + idE, HttpMethod.POST, postEntity, String.class);
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 
 		
 	}
@@ -476,15 +485,17 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 
 		MultiValueMap<String, String> event = new LinkedMultiValueMap<String, String>();
 		long id = venueService.findAll().iterator().next().getId();
+		long idE = eventService.findAll().iterator().next().getId();
 		event.add("_csrf", csrfToken);
 		event.add("name", "update test name");
 		event.add("venue.id", id + "");
+		event.add("id", idE + "");
 		event.add("description", "update test description");
 		event.add("summary", "test description");
 		event.add("date", "2022-06-13");
 		event.add("time", "20:00");
 		HttpEntity<MultiValueMap<String, String>> deleteEntity = new HttpEntity<MultiValueMap<String, String>>(event, getHeaders);
-		ResponseEntity<String> response = stateful.exchange(baseUrl + "/delete/1", HttpMethod.DELETE, deleteEntity, String.class);
+		ResponseEntity<String> response = stateful.exchange(baseUrl + "/delete/" + idE, HttpMethod.DELETE, deleteEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
 
 		
@@ -552,7 +563,7 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 		form.add("tweet", "test tweet");
 
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(form, postHeaders);
-		ResponseEntity<String> response = template.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = template.exchange(baseUrl + "/tweet/1", HttpMethod.POST, postEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
 
 		
@@ -561,6 +572,7 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 	//Sensible DATA
 	@Test
 	public void testPostTweetNoData() {
+		
 		template = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
 		
 		// Set up headers for GETting and POSTing.
@@ -583,9 +595,10 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
         
 		MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
 		form.add("_csrf", csrfToken);
+		form.add("tweet", "");
 
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(form, postHeaders);
-		ResponseEntity<String> response = template.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
+		ResponseEntity<String> response = template.exchange(baseUrl + "/tweet/1", HttpMethod.POST, postEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
 
 		
@@ -655,8 +668,8 @@ public class EventsControllerIntegrationTest extends AbstractTransactionalJUnit4
 		postHeaders.set("Cookie", cookie);
 		MultiValueMap<String, String> login = new LinkedMultiValueMap<>();
 		login.add("_csrf", csrfToken);
-		login.add("username", "Organiser");
-		login.add("password", "Organiser");
+		login.add("username", "Mustafa");
+		login.add("password", "Mustafa");
 		
 		// Log in.
 		postEntity = new HttpEntity<MultiValueMap<String, String>>(login,

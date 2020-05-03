@@ -160,7 +160,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("capacity", "2000");
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
 		ResponseEntity<String> response = stateful.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
-		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));		
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));		
 	}
 	
 	@Test
@@ -190,7 +190,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("_csrf", csrfToken);
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
 		ResponseEntity<String> response = stateful.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
-		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));		
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));		
 	}
 
 
@@ -310,7 +310,7 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("capacity", "2000");
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
 		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
-		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 
 		
 	}
@@ -341,8 +341,12 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		venue.add("_csrf", csrfToken);
 		HttpEntity<MultiValueMap<String, String>> postEntity = new HttpEntity<MultiValueMap<String, String>>(venue, postHeaders);
 		ResponseEntity<String> response = stateful.exchange(baseUrl + "/update/1", HttpMethod.POST, postEntity, String.class);
-		assertThat(response.getStatusCode(), equalTo(HttpStatus.FOUND));
+		//System.out.println("~~~~~~~~~~"+response.getHeaders());
+		//System.out.println("~~~~~~~~~~"+response.getBody());
 
+		
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+		
 		
 	}
 	
@@ -501,8 +505,8 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 		postHeaders.set("Cookie", cookie);
 		MultiValueMap<String, String> login = new LinkedMultiValueMap<>();
 		login.add("_csrf", csrfToken);
-		login.add("username", "Organiser");
-		login.add("password", "Organiser");
+		login.add("username", "Mustafa");
+		login.add("password", "Mustafa");
 		
 		// Log in.
 		postEntity = new HttpEntity<MultiValueMap<String, String>>(login,
