@@ -146,7 +146,7 @@ public class VenuesController {
 		model.addAttribute("venue", venue);
 		
 		redirectAttrs.addFlashAttribute("ok_message", "Venue updated.");	
-		return "redirect:/venues";
+		return "venues/updateVenue";
     }
 
 	@RequestMapping(value="/update/{id}", method= RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)

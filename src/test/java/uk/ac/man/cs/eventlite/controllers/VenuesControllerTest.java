@@ -266,7 +266,7 @@ public class VenuesControllerTest {
 				.param("capacity", "5000")
 				.accept(MediaType.TEXT_HTML).with(csrf()))
 		.andExpect(status().isOk())
-		.andExpect(view().name("venues/updateVenue")).andExpect(model().hasNoErrors())
+		.andExpect(view().name("venues/updateVenue")).andExpect(model().hasErrors())
 		.andExpect(handler().methodName("putVenue"));
 
 		verify(venueService, never()).save(venue);
@@ -288,7 +288,7 @@ public class VenuesControllerTest {
 				.param("capacity", "5000")
 				.accept(MediaType.TEXT_HTML).with(csrf()))
 		.andExpect(status().isOk())
-		.andExpect(view().name("venues/updateVenue")).andExpect(model().hasNoErrors())
+		.andExpect(view().name("venues/updateVenue")).andExpect(model().hasErrors())
 		.andExpect(handler().methodName("putVenue"));
 
 		verify(venueService, never()).save(venue);
@@ -331,8 +331,6 @@ public class VenuesControllerTest {
 	}
 	
 
-	/*
-	 * This test should work once form error handling is implemented for update venue
 	@Test
 	public void putEmptyVenue() throws Exception {
 		Venue v = new Venue();
@@ -343,14 +341,14 @@ public class VenuesControllerTest {
 		when(venueService.findOne(id)).thenReturn(v);
 		mvc.perform(MockMvcRequestBuilders.post("/venues/update/{id}", id).with(user("Rob").roles(Security.ADMIN_ROLE))
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-				.param("name", "").accept(MediaType.TEXT_HTML).with(csrf())).andExpect(status().isFound())
+				.param("name", "").accept(MediaType.TEXT_HTML).with(csrf())).andExpect(status().isOk())
 		.andExpect(view().name("venues/updateVenue"))
 		.andExpect(model().attributeHasFieldErrors("venue", "name"))
 		.andExpect(handler().methodName("putVenue"));
 
 		verify(venueService, never()).save(venue);
 	}
-	*/
+	
 	
 	@Test
 	public void getVenue() throws Exception {

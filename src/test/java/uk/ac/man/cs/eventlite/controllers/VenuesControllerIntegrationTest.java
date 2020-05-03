@@ -81,24 +81,6 @@ public class VenuesControllerIntegrationTest extends AbstractTransactionalJUnit4
 	
 	@Test
 	public void testShowUpdateEventPage() {
-//		template = new TestRestTemplate(HttpClientOption.ENABLE_COOKIES);
-//		
-//		// Set up headers for GETting and POSTing.
-//		HttpHeaders getHeaders = new HttpHeaders();
-//		HttpHeaders postHeaders = new HttpHeaders();
-//		
-//		getHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
-//		postHeaders.setAccept(Collections.singletonList(MediaType.TEXT_HTML));
-//		postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//		
-//		//Login and get cookie session
-//		String cookie = integrationLogin(template, getHeaders, postHeaders);
-//		
-//		// Set the session cookie and GET the new greeting form so we can read
-//		// the new CSRF token.
-//		getHeaders.set("Cookie", cookie);
-//		HttpEntity<String> getEntity = new HttpEntity<>(getHeaders);
-
 		
 		ResponseEntity<String> response = template.exchange(baseUrl + "/updateVenue/1", HttpMethod.GET, httpEntity, String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));

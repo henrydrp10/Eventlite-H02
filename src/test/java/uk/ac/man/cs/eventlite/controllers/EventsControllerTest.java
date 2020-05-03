@@ -319,14 +319,13 @@ public class EventsControllerTest {
 				.param("venue", venue.getName())
 				.accept(MediaType.TEXT_HTML).with(csrf()))
 		.andExpect(status().isOk())
-		.andExpect(view().name("events/updateEvent")).andExpect(model().hasNoErrors())
+		.andExpect(view().name("events/updateEvent")).andExpect(model().hasErrors())
 		.andExpect(handler().methodName("putEvent"));
 
 		verify(eventService, never()).save(event);
 	}
 
-	/*
-	 * A suggestion for testing an invalid parameter
+
 	@Test
 	public void putEventWithOldDate() throws Exception {
 
@@ -338,12 +337,12 @@ public class EventsControllerTest {
 				.param("venue", venue.getName())
 				.accept(MediaType.TEXT_HTML).with(csrf()))
 		.andExpect(status().isOk())
-		.andExpect(view().name("events/updateEvent")).andExpect(model().hasNoErrors())
+		.andExpect(view().name("events/updateEvent")).andExpect(model().hasErrors())
 		.andExpect(handler().methodName("putEvent"));
 
 		verify(eventService, never()).save(event);
 	}
-	*/
+	
 	
 	@Test
 	@WithMockUser(username = "Mustafa", password = "Mustafa", roles= {"USER"})
