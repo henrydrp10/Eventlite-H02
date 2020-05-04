@@ -1,7 +1,10 @@
 package uk.ac.man.cs.eventlite.controllers;
 
 import static org.hamcrest.Matchers.endsWith;
+
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +30,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import static org.mockito.Mockito.times;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,10 +50,12 @@ import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
 import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
-
 @ExtendWith(SpringExtension.class)
+
 @SpringBootTest(classes = EventLite.class)
+
 @AutoConfigureMockMvc
+
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 public class EventsControllerApiTest {
@@ -110,7 +117,9 @@ public class EventsControllerApiTest {
 		mvc.perform(get("/api/events").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 				.andExpect(handler().methodName("getAllEvents")).andExpect(jsonPath("$.length()", equalTo(2)))
 				.andExpect(jsonPath("$._links.self.href", endsWith("/api/events")))
-				.andExpect(jsonPath("$._embedded.events.length()", equalTo(1)));
+				.andExpect(jsonPath("$._embedded.events.length()", equalTo(1)))
+				.andExpect(jsonPath("$._embedded.events[0]._links.venue.href", not(empty())))
+				.andExpect(jsonPath("$._embedded.events[0]._links.venue.href", endsWith("events/0/venue")));
 
 		verify(eventService).findAll();
 	}
@@ -186,4 +195,37 @@ public class EventsControllerApiTest {
 
 		verify(eventService, never()).save(event);
 	}
+	
+	@Test
+	public void showEventTest() throws Exception {
+		
+		Venue v = new Venue();
+		v.setName("Venue");
+		v.setCapacity(1000);
+		venueService.save(v);
+		
+		Event e = new Event();
+		e.setId(10);
+		e.setName("Event");
+		e.setDate(LocalDate.now());
+		e.setTime(LocalTime.now());
+		e.setVenue(v);
+		e.setSummary("Summary");
+		e.setDescription("Description");
+		eventService.save(e);
+
+		
+		when(eventService.findOne(e.getId())).thenReturn(e);
+
+        String uri = "/api/events/" + e.getId();
+        System.out.println(uri);
+		mvc.perform(get(uri).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(handler().methodName("showEvent")).andExpect(jsonPath("$.length()", equalTo(7)))
+				.andExpect(jsonPath("$._links.self.href", endsWith(uri)))
+				.andExpect(jsonPath("$._links.event.href", endsWith(uri)))
+				.andExpect(jsonPath("$._links.venue.href", endsWith(uri + "/venue")));
+						
+		verify(eventService,  times(2)).findOne(e.getId());
+	}
+
 }

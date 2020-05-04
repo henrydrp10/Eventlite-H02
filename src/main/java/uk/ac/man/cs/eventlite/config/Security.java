@@ -24,10 +24,16 @@ public class Security extends WebSecurityConfigurerAdapter {
 	// By default we allow all GETs and full access to the H2 console.
 	private static final RequestMatcher[] NO_AUTH = { new AntPathRequestMatcher("/webjars/**", "GET"),
 			new AntPathRequestMatcher("/**", "GET"), new AntPathRequestMatcher("/h2-console/**") };
+	
+	private static final RequestMatcher[] Tweeter = { new AntPathRequestMatcher("/events/tweet/**", "POST") };
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		// By default, all requests are authenticated except our specific list.
+		// Any user, authenticated or not can share the event 
+		http.authorizeRequests().requestMatchers(Tweeter).permitAll();
+		// Event Organizers and Admins are reserved the privelege of accessing any page
+		// No distinction is made between organizers and admins because there is no reason for it at the moment
 		http.authorizeRequests().requestMatchers(NO_AUTH).permitAll().anyRequest().hasRole(ADMIN_ROLE);
 
 		// Use form login/logout for the Web.
@@ -55,7 +61,10 @@ public class Security extends WebSecurityConfigurerAdapter {
 		UserDetails markel = User.withUsername("Markel").password(encoder.encode("Vigo")).roles(ADMIN_ROLE).build();
 		UserDetails mustafa = User.withUsername("Mustafa").password(encoder.encode("Mustafa")).roles(ADMIN_ROLE)
 				.build();
+		
+		UserDetails joana = User.withUsername("Joana").password(encoder.encode("Cruz")).roles()
+				.build();
 
-		return new InMemoryUserDetailsManager(rob, caroline, markel, mustafa);
+		return new InMemoryUserDetailsManager(rob, caroline, markel, mustafa, joana);
 	}
 }

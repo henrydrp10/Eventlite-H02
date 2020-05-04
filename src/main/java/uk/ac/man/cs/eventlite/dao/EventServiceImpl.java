@@ -200,5 +200,12 @@ public class EventServiceImpl implements EventService {
 	    
 	    return lastFiveStatuses;
 	}
+
+	@Override
+	public boolean isEventPast(Event event) {
+
+		LocalDate currentTimeStamp = LocalDate.now(clock);
+		return currentTimeStamp.isAfter(event.getDate());
+	}
 	
 }

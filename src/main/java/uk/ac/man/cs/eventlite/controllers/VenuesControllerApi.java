@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import uk.ac.man.cs.eventlite.dao.VenueService;
+import uk.ac.man.cs.eventlite.entities.Event;
 import uk.ac.man.cs.eventlite.entities.Venue;
 
 @RestController
@@ -38,6 +41,50 @@ public class VenuesControllerApi {
 	public Resources<Resource<Venue>> getAllVenues() {
 
 		return venueToResource(venueService.findAll());
+	}
+	
+	@GetMapping(value = "/{venueId}")
+	public Resource<Venue> showVenue(@PathVariable final Long venueId) {
+		
+		if(venueService.findOne(venueId)==null) return null;
+		else return venueToResource(venueId); 
+			
+	}
+	
+	@GetMapping(value = "/{venueId}/events")
+	public Resources<Resource<Event>> getEventsForVenue(@PathVariable final Long venueId) {
+		
+		List<Event> events = venueService.getEventsForVenue(venueId);
+	    List<Resource<Event>> resources = new ArrayList<Resource<Event>>();
+	    
+	    for (final Event event : events) {
+	    	
+	        resources.add(eventToResource(event));
+	        
+	    }
+	  
+	    Link link = linkTo(methodOn(VenuesControllerApi.class)
+	      .getEventsForVenue(venueId)).withSelfRel();
+	    Resources<Resource<Event>> result = new Resources<Resource<Event>>(resources, link);
+	    return result;
+	} 
+	
+	@GetMapping(value = "/{venueId}/next3events")
+	public Resources<Resource<Event>> getThreeNextEventsForVenue(@PathVariable final Long venueId) {
+		
+		List<Event> events = venueService.getThreeUpcomingEventsForVenue(venueId);
+	    List<Resource<Event>> resources = new ArrayList<Resource<Event>>();
+	    
+	    for (final Event event : events) {
+	    	
+	        resources.add(eventToResource(event));
+	        
+	    }
+	  
+	    Link link = linkTo(methodOn(VenuesControllerApi.class)
+	      .getThreeNextEventsForVenue(venueId)).withSelfRel();
+	    Resources<Resource<Event>> result = new Resources<Resource<Event>>(resources, link);
+	    return result;
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -69,15 +116,40 @@ public class VenuesControllerApi {
 
 		return new Resource<Venue>(venue, selfLink);
 	}
+	
+	private Resource<Venue> venueToResource(Long venueId) {
+		
+		Link selfLink = linkTo(VenuesControllerApi.class).slash(venueId).withSelfRel();
+		
+		Link venueLink = linkTo(methodOn(VenuesControllerApi.class)
+				  .showVenue(venueId)).withRel("venue");
+		
+		//Links that only show up in venue/id page should be added here
+		Link next3eventsLink = linkTo(methodOn(VenuesControllerApi.class)
+				  .getThreeNextEventsForVenue(venueId)).withRel("next3events");
+		
+		//Link events = ...
+		Link eventsForVenue = linkTo(methodOn(VenuesControllerApi.class)
+				  .getEventsForVenue(venueId)).withRel("events");
+
+		return new Resource<Venue>(venueService.findOne(venueId), selfLink, venueLink, next3eventsLink, eventsForVenue);	
+		}
 
 	private Resources<Resource<Venue>> venueToResource(Iterable<Venue> venues) {
 		Link selfLink = linkTo(methodOn(VenuesControllerApi.class).getAllVenues()).withSelfRel();
+		Link profileLink = linkTo(ProfileControllerApi.class).slash("venues").withRel("profile");
 
 		List<Resource<Venue>> resources = new ArrayList<Resource<Venue>>();
 		for (Venue venue : venues) {
 			resources.add(venueToResource(venue));
 		}
 
-		return new Resources<Resource<Venue>>(resources, selfLink);
+		return new Resources<Resource<Venue>>(resources, selfLink, profileLink);
+	}
+	
+	private Resource<Event> eventToResource(Event event) {
+		Link selfLink = linkTo(EventsControllerApi.class).slash(event.getId()).withSelfRel();
+
+		return new Resource<Event>(event, selfLink);
 	}
 }

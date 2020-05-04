@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,15 +36,59 @@ public class EventsControllerApiIntegrationTest extends AbstractTransactionalJUn
 
 	@Autowired
 	private TestRestTemplate template;
+    
+	//private static final String INDEX = "/1";
+	
+	@LocalServerPort
+	private int port;
 
+	private String baseUrl;
+	//private String eventUrl;
+	
+	private final TestRestTemplate evil = new TestRestTemplate("Bad", "Person");
+
+
+	
 	@BeforeEach
 	public void setup() {
+		this.baseUrl = "http://localhost:" + port + "/api/events";
+	//	this.eventUrl = baseUrl + INDEX;
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
 		httpEntity = new HttpEntity<String>(headers);
 	}
+	
 
+	@Test
+	public void deleteEventBadAuth() {
+		HttpHeaders deleteHeaders = new HttpHeaders();
+		deleteHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+		deleteHeaders.setContentType(MediaType.APPLICATION_JSON);
+		
+		HttpEntity<String> deleteEntity = new HttpEntity<String>("{ \"name\": \"Event, %s!\" }", deleteHeaders);
+		
+		ResponseEntity<String> response = evil.exchange(baseUrl, HttpMethod.DELETE, deleteEntity, String.class);
+
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+		//assertThat(4, equalTo(countRowsInTable("events")));
+	}
+
+	@Test
+	public void postEventBadAuth() {
+		HttpHeaders postHeaders = new HttpHeaders();
+		postHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+		postHeaders.setContentType(MediaType.APPLICATION_JSON);
+		
+		HttpEntity<String> postEntity = new HttpEntity<String>("{ \"name\": \"Test Event New\" }", postHeaders);
+
+		ResponseEntity<String> response = evil.exchange(baseUrl, HttpMethod.POST, postEntity, String.class);
+
+		assertThat(response.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+		//assertThat(4, equalTo(countRowsInTable("events")));
+	}
+	
 	@Test
 	public void testGetAllEvents() {
 		ResponseEntity<String> response = template.exchange("/api/events", HttpMethod.GET, httpEntity, String.class);

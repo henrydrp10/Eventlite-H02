@@ -7,7 +7,7 @@
 <body>
   <div layout:fragment="content">
     <h1>Update an event</h1>
-    <form  th:object="${event}" th:action="@{/events/update/}+${event.id}"  method="post">
+    <form  th:object="${event}" th:action="@{/events/update/}+${event.id}"  action="#" method="post">
      
       <div class="form-group">
         <p class="text-danger">* Required</p>

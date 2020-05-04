@@ -12,7 +12,7 @@
 <style>
   body { margin:0; padding:0; }
   #map-container { margin:0; margin-bottom:650px; padding:0; }
-  #map { position:absolute; width:1100px; height:600px }
+  #map { position:absolute; width:1110px; height:600px }
   
   .mapboxgl-popup { max-width: 200px; }
   .mapboxgl-popup-content { text-align: center; font-family: 'Open Sans', sans-serif; }
@@ -23,12 +23,11 @@
 <div layout:fragment="content">
     <h1 th:text="${event.name}"> Text</h1>
      <blockquote>
-      <p > <b>Venue: </b></p>
+      <p> <b>Venue: </b></p>
           <p>
             <a th:href="@{/venues/{num}(num=${event.venue.id})}" th:text="${event.venue.name}">My Event</a>
           </p>
-
-       <p > <b>Date: </b></p>
+      <p > <b>Date: </b></p>
       <p th:text="${event.date}"></p>
       <p></p>
       <p > <b>Time: </b></p>
@@ -41,15 +40,6 @@
       <p th:text="${event.description}"></p>
     </blockquote>
     
-    <a class="btn btn-primary" role="button" th:href="@{/events}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
-    
-    <br><br>
-    <div class="form-group">
-      <form th:action="@{/events/delete/{num}(num=${id})}" th:method="delete">
-      <button type="submit" class="btn btn-primary"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>
-      </form>
-    </div>
-    
     <div th:if="${tweetString}">
     	<div class="alert alert-success alert-dismissible fade show" role="alert">
   			Your tweet: <strong th:text = "${tweetString}"></strong> was posted
@@ -59,15 +49,17 @@
 		</div>
     </div>
     
-     <br>
        <form th:action="@{/events/tweet/{num}(num=${id})}" th:method="post">
-         <p><b> Share the event </b></p>
+         <h3>Share the event</h3>
+         <p>
          <input type="text" class="form-control" name="tweet" th:placeholder="${event.name}">
-         <br>
-         <button id="tweetBtn" type="submit" class="btn btn-primary" onclick="displaySuccessBox()"><i class="fab fa-twitter-square"></i> Send tweet</button>
+         </p>
+         <p>
+           <button id="tweetBtn" type="submit" class="btn btn-primary" onclick="displaySuccessBox()"><i class="fab fa-twitter-square"></i> Send tweet</button>
+         </p>
        </form>
-   <br><br>
   
+    <h3>Event location</h3>
     <div id='map-container'><div id='map'></div></div>
 
 	<script th:inline="javascript">
@@ -96,6 +88,12 @@
 	
 	/*]]>*/
 	</script>
+    
+    <p>
+      <form th:action="@{/events/delete/{num}(num=${id})}" th:method="delete">
+        <button th:if="${isAdmin}" type="submit" class="btn btn-primary"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>
+      <a class="btn btn-primary btn-back" role="button" th:href="@{/events}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
+    </p>
 
   </div>
 </body>

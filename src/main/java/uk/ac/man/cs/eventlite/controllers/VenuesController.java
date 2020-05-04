@@ -2,11 +2,15 @@ package uk.ac.man.cs.eventlite.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import uk.ac.man.cs.eventlite.config.Security;
 import uk.ac.man.cs.eventlite.dao.EventRepository;
 import uk.ac.man.cs.eventlite.dao.EventService;
 import uk.ac.man.cs.eventlite.dao.VenueService;
@@ -39,11 +44,22 @@ public class VenuesController {
 	@Autowired
 	private EventService eventService;
 	
+	private boolean hasRole(String role)
+	{
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		Set<String> roles = authentication.getAuthorities().stream()
+		     .map(r -> r.getAuthority()).collect(Collectors.toSet());
+		
+		return roles.contains("ROLE_"+role);
+		
+	}
+	
 	String MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiZXZlbnRsaXRlaDAyIiwiYSI6ImNrOG44NjNrNTBrZGMzbW9jbGRqc3kxbXQifQ.H2MJkZCOBTT-X9_noMmreA";
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAllVenues(Model model) {
-		
+		model.addAttribute("isAdmin", hasRole(Security.ADMIN_ROLE));
 		model.addAttribute("venuelist", venueService.findAll());
 		
 		return "venues/index";
@@ -51,7 +67,7 @@ public class VenuesController {
 	
 	@RequestMapping(value = "/byName", method = RequestMethod.GET)
 	public String getVenuesByName(Model model, @RequestParam String search) {
-		
+		model.addAttribute("isAdmin", hasRole(Security.ADMIN_ROLE));
 		model.addAttribute("venues", venueService.findAllByName(search));
 		return "venues/byName";
 	}
@@ -87,22 +103,29 @@ public class VenuesController {
 	public String showVenueDetails(@PathVariable("id") long id, Model model) {
 
 		Venue venue = venueService.findOne(id);
-		List<Event> upcomingEventsInThisVenue = new ArrayList<Event>();
-		Iterable<Event> events = eventService.findFuture();
-		for(Event event : events)
-		{
-			if( event.getVenue() == venue)
-			{
-				upcomingEventsInThisVenue.add(event);
-			}
+		
+		if (venue != null) {
 			
-		}	
-		model.addAttribute("venue", venue);
-		model.addAttribute("eventsf", upcomingEventsInThisVenue);
-		
-		
+			List<Event> upcomingEventsInThisVenue = new ArrayList<Event>();
+			Iterable<Event> events = eventService.findFuture();
+			
+			for(Event event : events) {
+				if( event.getVenue() == venue) {
+					upcomingEventsInThisVenue.add(event);
+				}
+			}	
+			model.addAttribute("isAdmin", hasRole(Security.ADMIN_ROLE));
+			model.addAttribute("venue", venue);
+			model.addAttribute("eventsf", upcomingEventsInThisVenue);
+			
+			
 
-		return "venues/venue_details";
+			return "venues/venue_details";
+		}
+		else {
+			return "redirect:/venues"; 
+		}
+		
 	}
 	
 
@@ -132,19 +155,28 @@ public class VenuesController {
 	 
 	 	Venue venue = venueService.findOne(id);
 	 	
-	 	if(venue==null) {
+	 	if (venue == null) {
 	 		redirectAttrs.addFlashAttribute("error_message", "venue not found");
 	 	}
 	 	
 		model.addAttribute("venue", venue);
 		
-        return "venues/updateVenue";
+		redirectAttrs.addFlashAttribute("ok_message", "Venue updated.");	
+		return "venues/updateVenue";
     }
 
 	@RequestMapping(value="/update/{id}", method= RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public String putEvent(@PathVariable("id") Long id, Venue venue) {
-		 
-		Venue newVenue = venueService.findOne(id);
+	public String putVenue(@RequestBody @Valid @ModelAttribute Venue venue,
+			BindingResult errors, Model model, @PathVariable("id") long id, RedirectAttributes redirectAttrs) {
+		
+		Venue newVenue = venueService.findOne(id);	
+		
+		if (errors.hasErrors() ) {
+			model.addAttribute("venue", venue);
+			
+			return "venues/updateVenue";
+		}
+		
 		newVenue.setName(venue.getName());
 		newVenue.setPostCode(venue.getPostCode());
 		newVenue.setRoadName(venue.getRoadName());
