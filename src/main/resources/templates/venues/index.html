@@ -41,7 +41,7 @@
     </table>
     
     <p>
-      <a class="btn btn-primary" role="button" href="/venues/new"><i class="fas fa-plus" aria-hidden="true"></i> Add a new venue</a>
+      <a th:if="${isAdmin}" class="btn btn-primary" role="button" href="/venues/new"><i class="fas fa-plus" aria-hidden="true"></i> Add a new venue</a>
       <a class="btn btn-primary btn-back" role="button" th:href="@{/}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
     </p>
 
