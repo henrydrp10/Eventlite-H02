@@ -146,7 +146,7 @@
     </table>
     
     <p>
-      <a class="btn btn-primary" role="button" href="/events/new"><i class="fas fa-plus" aria-hidden="true"></i> Add a new event</a>
+      <a th:if="${isAdmin}" class="btn btn-primary" role="button" href="/events/new"><i class="fas fa-plus" aria-hidden="true"></i> Add a new event</a>
       <a class="btn btn-primary btn-back" role="button" th:href="@{/}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
     </p>
 

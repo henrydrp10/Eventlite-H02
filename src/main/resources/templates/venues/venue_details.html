@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default}">
 <head>
-  <title>Event</title>
+  <title>Venue</title>
 </head>
 <body>
   <div layout:fragment="content">
@@ -47,9 +47,8 @@
     </table>
     
     <p>
-      <form  th:if="${isAdmin}"  th:action="@{/venues/delete/{num}(num=${id})}" th:method="delete">
-        <button type="submit" class="btn btn-primary"><i class="fas fa-trash" aria-hidden="true"></i> Delete venue</button>
-     </form>
+      <form th:action="@{/venues/delete/{num}(num=${id})}" th:method="delete">
+        <button th:if="${isAdmin}" type="submit" class="btn btn-primary"><i class="fas fa-trash" aria-hidden="true"></i> Delete venue</button>
       <a class="btn btn-primary btn-back" role="button" th:href="@{/venues}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
     </p>
      
